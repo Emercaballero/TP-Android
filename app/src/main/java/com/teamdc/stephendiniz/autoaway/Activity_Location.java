@@ -1,6 +1,7 @@
 package com.teamdc.stephendiniz.autoaway;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -27,16 +28,19 @@ public class Activity_Location extends Activity implements View.OnClickListener 
     private CheckBox checkBox;
     private Button button1;
     private Button button2;
+    private Button button3;
     private RadioButton radio0;
     private RadioButton radio1;
     private RadioButton radio2;
-    private TextView textCounter;
+    private TextView text;
+    private Calendar cal;
 
     SharedPreferences prefs;
     final String THEME_PREF		= "themePreference";
 
     private LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
+
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -70,8 +74,10 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         setContentView(R.layout.location);
         button1 = (Button) findViewById(R.id.button1);
         button2 = (Button) findViewById(R.id.button2);
+        button3 = (Button) findViewById(R.id.button3);
         button1.setOnClickListener(this);
         button2.setOnClickListener(this);
+        button3.setOnClickListener(this);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         checkBox = (CheckBox) findViewById(R.id.checkBox1);
         checkBox.setOnClickListener(this);
@@ -81,7 +87,7 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         radio0.setOnClickListener(this);
         radio1.setOnClickListener(this);
         radio2.setOnClickListener(this);
-        //textCounter = (TextView) findViewById(R.id.textView2);
+        text = (TextView) findViewById(R.id.textView1);
     }
 
     private void setButtonState() {
@@ -104,7 +110,6 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         return true;
     }
 
-    @Override
     public void onClick(View v) {
         if (v == checkBox)
             clickCheckBox();
@@ -112,6 +117,8 @@ public class Activity_Location extends Activity implements View.OnClickListener 
             clickButton1();
         else if (v == button2)
             clickButton2();
+        else if (v == button3)
+            clickButton3();
         else
             setButtonState(); // for radio buttons
     }
@@ -124,12 +131,19 @@ public class Activity_Location extends Activity implements View.OnClickListener 
 
     private void clickButton1() { //Boton Save
         TextView textView;
+        int minIni, minFin;
         textView = (TextView) findViewById(R.id.textView1);
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, locationListener);
 
         Location location;
-        if (radio0.isChecked())
-            //location = locationManager.getLastKnownLocation("gps");
-            location = locationManager.getProvider("gps");
+        if(radio0.isChecked()) {
+            minIni = cal.get(Calendar.MINUTE);
+            do {
+                location = locationManager.getLastKnownLocation("gps");
+                minFin = cal.get(Calendar.MINUTE);
+            } while (location == null || minFin != minIni);
+        }
         else if (radio1.isChecked())
             location = locationManager.getLastKnownLocation("network");
         else
@@ -150,17 +164,61 @@ public class Activity_Location extends Activity implements View.OnClickListener 
                     location.getAccuracy(), (now - location.getTime()) / 1000));
         }
         else {
-            //Aca es si ponemos in localización.
+            //Aca es si ponemos sin localización.
         }
     }
 
     private void clickButton2() { //Boton Cancel
         TextView textView;
+        int minIni, minFin;
         textView = (TextView) findViewById(R.id.textView1);
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, locationListener);
 
         Location location;
-        if (radio0.isChecked())
-            location = locationManager.getLastKnownLocation("gps");
+        if (radio0.isChecked()) {
+            minIni = cal.get(Calendar.MINUTE);
+            do {
+                location = locationManager.getLastKnownLocation("gps");
+                minFin = cal.get(Calendar.MINUTE);
+            } while (location == null || minFin != minIni);
+        }
+        else if (radio1.isChecked())
+            location = locationManager.getLastKnownLocation("network");
+        else
+            location = null;
+        if (location == null) {
+            if (radio0.isChecked()) {
+                if (locationManager.isProviderEnabled("gps"))
+                    textView.setText("No GPS signal!");
+                else
+                    textView.setText("Turn GPS on!");
+            } else
+                textView.setText("Network not enabled!");
+        } else {
+            long now = Calendar.getInstance().getTimeInMillis();
+            textView.setText(String.format("Latitude = %s\nLongitude = %s\n"
+                            + "Accuracy = %f\n" + "%d seconds ago",
+                    location.getLatitude(), location.getLongitude(),
+                    location.getAccuracy(), (now - location.getTime()) / 1000));
+        }
+    }
+
+    private void clickButton3() { //Boton View
+        TextView textView;
+        int minIni, minFin;
+        textView = (TextView) findViewById(R.id.textView1);
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, locationListener);
+
+        Location location;
+        if (radio0.isChecked()) {
+            minIni = cal.get(Calendar.MINUTE);
+            do {
+                location = locationManager.getLastKnownLocation("gps");
+                minFin = cal.get(Calendar.MINUTE);
+            } while (location == null || minFin != minIni);
+        }
         else if (radio1.isChecked())
             location = locationManager.getLastKnownLocation("network");
         else
