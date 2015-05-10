@@ -24,6 +24,7 @@
     <string name="menu_filter_addCustom">Ajouter un numéro</string>
     <string name="menu_filter_addFromContacts">Ajouter depuis les Contacts</string>
     <string name="menu_main_filtering">Filtrage des Destinataires</string>
+    <string name="menu_main_gps">GPS Configuration</string>
     <string name="menu_main_messages">Editer les Messages d\'absence</string>
     <string name="menu_main_scheduling">Loin de Planification</string>
     <string name="menu_main_theme_dark">Changer de Dark Theme</string>

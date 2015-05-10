@@ -105,6 +105,7 @@
 	<string name="menu_main_scheduling">Planowanie</string>
 	<string name="menu_main_theme_light">Zmień na motyw Light</string>
 	<string name="menu_main_theme_dark">Zmień na motyw Dark</string>
+	<string name="menu_main_gps">GPS Configuration</string>
 
 	<string name="menu_messages_add">Dodaj wiadomość</string>
 	<string name="menu_messages_alphabetize">Sortuj alfabetycznie</string>

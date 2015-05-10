@@ -20,6 +20,7 @@
     <uses-feature android:name="android.hardware.Camera" />
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -44,6 +45,9 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/activity_messages_title" />
         <activity
+            android:name="com.teamdc.stephendiniz.autoaway.Activity_Location"
+            android:label="@string/activity_location" />
+        <activity
             android:name="com.teamdc.stephendiniz.autoaway.Activity_ContactPicker"
             android:configChanges="orientation|keyboardHidden" />
         <activity
@@ -67,15 +71,6 @@
         		android:priority="9001">
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.teamdc.stephendiniz.autoaway.Activity_Location"
-            android:label="@string/activity_location" />
-
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
 
         <service
             android:name="com.teamdc.stephendiniz.autoaway.Service_Away"

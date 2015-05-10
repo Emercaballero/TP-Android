@@ -9,9 +9,9 @@
     	android:id="@+id/menu_filtering"
     	android:title="@string/menu_main_filtering" />
 	
-	<!-- <item
-	    android:id="@+id/menu_scheduling"
-	    android:title="@string/menu_main_scheduling" /> -->
+	<item
+	    android:id="@+id/menu_activity_location"
+	    android:title="@string/menu_main_gps" /> -->
 	    
 	<item
     	android:id="@+id/menu_theme"

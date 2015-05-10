@@ -106,6 +106,7 @@
 	<string name="menu_main_scheduling">Lejos de Programación</string>
 	<string name="menu_main_theme_light">Cambiar el Tema Luz</string>
 	<string name="menu_main_theme_dark">Cambie al Tema Oscuro</string>
+	<string name="menu_main_gps">Configuración GPS</string>
 	
 	<string name="menu_messages_add">Añadir Mensajes de Ausencia</string>
 	<string name="menu_filter_addFromContacts">Añadir de las Contactos</string>

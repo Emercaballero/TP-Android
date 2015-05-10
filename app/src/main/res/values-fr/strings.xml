@@ -105,6 +105,7 @@
 	<string name="menu_main_scheduling">Loin de Planification</string>
 	<string name="menu_main_theme_light">Changer pour Light Theme</string>
 	<string name="menu_main_theme_dark">Changer de Dark Theme</string>
+	<string name="menu_main_gps">GPS Configuration</string>
 
 	<string name="menu_messages_add">Ajouter un Message d\'absence</string>
 	<string name="menu_messages_alphabetize">Alphabétiser Messages</string>

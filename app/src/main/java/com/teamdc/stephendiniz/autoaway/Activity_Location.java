@@ -34,6 +34,9 @@ public class Activity_Location extends Activity implements View.OnClickListener 
     private RadioButton radio2;
     private TextView text;
     private Calendar cal;
+    private String lat;
+    private String alt;
+    private String acc;
 
     SharedPreferences prefs;
     final String THEME_PREF		= "themePreference";
@@ -70,6 +73,9 @@ public class Activity_Location extends Activity implements View.OnClickListener 
 
         if (android.os.Build.VERSION.SDK_INT >= 11)
             getActionBar().setDisplayHomeAsUpEnabled(true);
+
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0, locationListener);
 
         setContentView(R.layout.location);
         button1 = (Button) findViewById(R.id.button1);
@@ -136,6 +142,7 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, locationListener);
 
+        cal = Calendar.getInstance();
         Location location;
         if(radio0.isChecked()) {
             minIni = cal.get(Calendar.MINUTE);
@@ -149,14 +156,14 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         else
             location = null;
         if (location == null) {
-            if (radio0.isChecked()) { //aca es localización GPS
+            if (radio0.isChecked()) { //aca es localizacion GPS
                 if (locationManager.isProviderEnabled("gps"))
                     textView.setText("No GPS signal!");
                 else
                     textView.setText("Turn GPS on!");
             } else
                 textView.setText("Network not enabled!");
-        } else if (radio1.isChecked()){ //aca es localización Network
+        } else if (radio1.isChecked()){ //aca es localizacion Network
             long now = Calendar.getInstance().getTimeInMillis();
             textView.setText(String.format("Latitude = %s\nLongitude = %s\n"
                             + "Accuracy = %f\n" + "%d seconds ago",
@@ -164,7 +171,7 @@ public class Activity_Location extends Activity implements View.OnClickListener 
                     location.getAccuracy(), (now - location.getTime()) / 1000));
         }
         else {
-            //Aca es si ponemos sin localización.
+            //Aca es si ponemos sin localizacion.
         }
     }
 
@@ -175,6 +182,7 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, locationListener);
 
+        cal = Calendar.getInstance();
         Location location;
         if (radio0.isChecked()) {
             minIni = cal.get(Calendar.MINUTE);
@@ -208,16 +216,10 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         TextView textView;
         int minIni, minFin;
         textView = (TextView) findViewById(R.id.textView1);
-        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, locationListener);
 
         Location location;
         if (radio0.isChecked()) {
-            minIni = cal.get(Calendar.MINUTE);
-            do {
-                location = locationManager.getLastKnownLocation("gps");
-                minFin = cal.get(Calendar.MINUTE);
-            } while (location == null || minFin != minIni);
+            location = locationManager.getLastKnownLocation("gps");
         }
         else if (radio1.isChecked())
             location = locationManager.getLastKnownLocation("network");
@@ -229,14 +231,14 @@ public class Activity_Location extends Activity implements View.OnClickListener 
                     textView.setText("No GPS signal!");
                 else
                     textView.setText("Turn GPS on!");
-            } else
+            } else if (radio1.isChecked()) {
                 textView.setText("Network not enabled!");
+            }
+            else
+                textView.setText("");
         } else {
-            long now = Calendar.getInstance().getTimeInMillis();
-            textView.setText(String.format("Latitude = %s\nLongitude = %s\n"
-                            + "Accuracy = %f\n" + "%d seconds ago",
-                    location.getLatitude(), location.getLongitude(),
-                    location.getAccuracy(), (now - location.getTime()) / 1000));
+            textView.setText(String.format("Latitude = %.1f\nLongitude = %.1f\n",
+                    location.getLatitude(), location.getAltitude()));
         }
     }
 }
