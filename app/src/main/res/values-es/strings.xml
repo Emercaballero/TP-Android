@@ -163,7 +163,7 @@
 
 	<!-- Miscellaneous -->
 	<string name="default_message_title">Mensaje Defecto</string>
-	<string name="default_message_content">Hola, estoy ocupado, yo te mensaje pronto</string>
+	<string name="default_message_content">Hola, estoy ocupado.</string>
 	
 	<string name="notification_ticker_start">Servicio de Auto-Away está funcionando</string>
 	<string name="notification_ticker_replied">Respondió de forma automática a</string>

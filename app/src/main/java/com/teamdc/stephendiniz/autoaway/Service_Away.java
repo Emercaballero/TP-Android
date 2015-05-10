@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.hardware.Camera;
 import android.media.AudioManager;
@@ -675,10 +676,15 @@ public class Service_Away extends Service
 	public int getCallText()								{ return callText;													}
 	public void setCallText(int callText)					{ this.callText = callText;											}
 	
-	public String getMessageContent(boolean status) 		{ if(status)
-																return "[Auto-Away]: " + messageContent;
-
-															  return messageContent;											}
+	public String getMessageContent(boolean status) {
+		SharedPreferences preferencias=getSharedPreferences("datosgps", Context.MODE_PRIVATE);
+		String text;
+		text = preferencias.getString("text","");
+		if (status) {
+			return "[Auto-Away]: " + messageContent + " " + text;
+		}
+		return messageContent + " " + text;
+	}
 	public void setMessageContent(String messageContent)	{ this.messageContent = messageContent;								}
 
 	public boolean getInformStatus()						{ return informStatus;												}

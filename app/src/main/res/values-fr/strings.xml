@@ -163,7 +163,7 @@
 
 	<!-- Miscellaneous -->
 	<string name="default_message_title">Message par Défaut</string>
-	<string name="default_message_content">Salut, je suis occupé, je t\'enverrai un message plus tard</string>
+	<string name="default_message_content">Salut, je suis occupé.</string>
 	
 	<string name="notification_ticker_start">Le Service Auto-Away est désormais lancé</string>
 	<string name="notification_ticker_replied">Répondu automatiquement à</string>

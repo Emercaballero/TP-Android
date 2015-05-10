@@ -105,7 +105,6 @@ public class Activity_Location extends Activity implements View.OnClickListener 
     @Override
     protected void onResume() {
         super.onResume();
-        setButtonState();
     }
 
     @Override
@@ -136,60 +135,12 @@ public class Activity_Location extends Activity implements View.OnClickListener 
     }
 
     private void clickButton1() { //Boton Save
-        TextView textView;
-        int minIni, minFin;
-        textView = (TextView) findViewById(R.id.textView1);
-        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, locationListener);
-
-        cal = Calendar.getInstance();
+        String text;
+        text= "";
         Location location;
-        if(radio0.isChecked()) {
-            minIni = cal.get(Calendar.MINUTE);
-            do {
-                location = locationManager.getLastKnownLocation("gps");
-                minFin = cal.get(Calendar.MINUTE);
-            } while (location == null || minFin != minIni);
-        }
-        else if (radio1.isChecked())
-            location = locationManager.getLastKnownLocation("network");
-        else
-            location = null;
-        if (location == null) {
-            if (radio0.isChecked()) { //aca es localizacion GPS
-                if (locationManager.isProviderEnabled("gps"))
-                    textView.setText("No GPS signal!");
-                else
-                    textView.setText("Turn GPS on!");
-            } else
-                textView.setText("Network not enabled!");
-        } else if (radio1.isChecked()){ //aca es localizacion Network
-            long now = Calendar.getInstance().getTimeInMillis();
-            textView.setText(String.format("Latitude = %s\nLongitude = %s\n"
-                            + "Accuracy = %f\n" + "%d seconds ago",
-                    location.getLatitude(), location.getLongitude(),
-                    location.getAccuracy(), (now - location.getTime()) / 1000));
-        }
-        else {
-            //Aca es si ponemos sin localizacion.
-        }
-    }
 
-    private void clickButton2() { //Boton Cancel
-        TextView textView;
-        int minIni, minFin;
-        textView = (TextView) findViewById(R.id.textView1);
-        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, locationListener);
-
-        cal = Calendar.getInstance();
-        Location location;
         if (radio0.isChecked()) {
-            minIni = cal.get(Calendar.MINUTE);
-            do {
-                location = locationManager.getLastKnownLocation("gps");
-                minFin = cal.get(Calendar.MINUTE);
-            } while (location == null || minFin != minIni);
+            location = locationManager.getLastKnownLocation("gps");
         }
         else if (radio1.isChecked())
             location = locationManager.getLastKnownLocation("network");
@@ -198,26 +149,33 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         if (location == null) {
             if (radio0.isChecked()) {
                 if (locationManager.isProviderEnabled("gps"))
-                    textView.setText("No GPS signal!");
+                    text = "No GPS signal!";
                 else
-                    textView.setText("Turn GPS on!");
-            } else
-                textView.setText("Network not enabled!");
+                    text = "Turn GPS on!";
+            } else if (radio1.isChecked()) {
+                text = "Network not enabled!";
+            }
+            else
+                text = "";
         } else {
-            long now = Calendar.getInstance().getTimeInMillis();
-            textView.setText(String.format("Latitude = %s\nLongitude = %s\n"
-                            + "Accuracy = %f\n" + "%d seconds ago",
-                    location.getLatitude(), location.getLongitude(),
-                    location.getAccuracy(), (now - location.getTime()) / 1000));
+            text = (String.format("Lat=%.1f Long=%.1f",location.getLatitude(), location.getAltitude()));
+            SharedPreferences preferencias=getSharedPreferences("datosgps",Context.MODE_PRIVATE);
+            preferencias.edit().putString("text", text).commit();
         }
+        finish();
+    }
+
+    private void clickButton2() { //Boton Cancel
+        finish();
+        return;
     }
 
     private void clickButton3() { //Boton View
         TextView textView;
-        int minIni, minFin;
         textView = (TextView) findViewById(R.id.textView1);
 
         Location location;
+
         if (radio0.isChecked()) {
             location = locationManager.getLastKnownLocation("gps");
         }
@@ -239,6 +197,7 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         } else {
             textView.setText(String.format("Latitude = %.1f\nLongitude = %.1f\n",
                     location.getLatitude(), location.getAltitude()));
+
         }
     }
 }

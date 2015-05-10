@@ -343,8 +343,10 @@ public class Activity_Main extends PreferenceActivity implements OnPreferenceCha
 
 			case R.id.menu_activity_location:
 			Intent gps = new Intent(this, Activity_Location.class);
+
 			startActivity(gps);
 			break;
+
 			case R.id.menu_theme:
 				if(prefs.getString(THEME_PREF, "LIGHT").equals("LIGHT"))
 					editor.putString(THEME_PREF, "DARK");

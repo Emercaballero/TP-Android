@@ -163,7 +163,7 @@
 
 	<!-- Miscellaneous -->
 	<string name="default_message_title">Default Message</string>
-	<string name="default_message_content">Hey, I\'m busy, I\'ll text you later</string>
+	<string name="default_message_content">Hey, I\'m busy.</string>
 	
 	<string name="notification_ticker_start">Auto-Away Service now running</string>
 	<string name="notification_ticker_replied">Auto replied to</string>
