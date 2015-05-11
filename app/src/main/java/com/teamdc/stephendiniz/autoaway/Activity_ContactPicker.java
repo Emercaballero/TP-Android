@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -51,8 +52,8 @@ public class Activity_ContactPicker extends ListActivity
 	static final int FILTERING_SAVED		= 3;
 	static final int FILTERING_BLANK		= 4;
 
-	ArrayList<Contact> contacts = new ArrayList<Contact>();
-	ArrayList<PhoneContact> pContacts = new ArrayList<PhoneContact>();
+	List<Contact> contacts = new ArrayList<Contact>();
+	List<PhoneContact> pContacts = new ArrayList<PhoneContact>();
 
 	private int filterStatus;
 	private String file;
@@ -138,8 +139,8 @@ public class Activity_ContactPicker extends ListActivity
 		MessageListArrayAdapter adapter = new MessageListArrayAdapter(this, names, numbers);
 		setListAdapter(adapter);
 	}
-	
-	@SuppressLint("NewApi")
+
+    @SuppressLint("NewApi")
 	public void onListItemClick(ListView l, View v, int position, long id)
 	{
 		super.onListItemClick(l, v, position, id);
@@ -320,7 +321,7 @@ public class Activity_ContactPicker extends ListActivity
 		return exists;
 	}
 	
-	public int phoneContactSearch(ArrayList<PhoneContact> pCon, String keyword)
+	public int phoneContactSearch(List<PhoneContact> pCon, String keyword)
 	{
 		for (int i = 0; i < pCon.size(); i++)
 			if (pCon.get(i).getName().equals(keyword))

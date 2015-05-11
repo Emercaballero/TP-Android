@@ -94,8 +94,7 @@ public class Service_Away extends Service
 	private int startId;
 
 	//linterna
-	private Camera objCamara;
-	Camera.Parameters parametrosCamara;
+    private Camara camara = Camara.getInstance();
 
 	public void onStart(Intent intent, int startId)
 	{
@@ -312,7 +311,6 @@ public class Service_Away extends Service
 	{
 
 		SmsManager manager = SmsManager.getDefault();
-		getobjCamara();
 
 		wakeLock.acquire();
 		Log.d(TAG, "Wake Lock Acquired!");
@@ -323,23 +321,15 @@ public class Service_Away extends Service
 
 			manager.sendMultipartTextMessage(getReturnAddress(), null, messagelist, null, null);
 			//Activar Luz de la camara dos veces
-			encenderFlash();
-			Log.i(TAG, "Light on!");
-			apagarFlash();
-			encenderFlash();
-			apagarFlash();
+            camara.hacerGuinio(2);
 			Log.i(TAG, "Multipart Text Message Sent!");
 		}
 		else
 		{
 			manager.sendTextMessage(getReturnAddress(), null, getMessageContent(getInformStatus()), sentPI, null);
 			//Activar Luz de la camara dos veces
-			encenderFlash();
-			Log.i(TAG, "Light on!");
-			apagarFlash();
-			encenderFlash();
-			apagarFlash();
-			Log.i(TAG, "Text Message Sent!");
+            camara.hacerGuinio(2);
+            Log.i(TAG, "Text Message Sent!");
 		}
 		
 		wakeLock.release();
@@ -717,43 +707,6 @@ public class Service_Away extends Service
 	public void setName(String name)						{ this.name = name;													}
 	
 	public IBinder onBind(Intent i) 						{ return null; 														}
-
-	private void getobjCamara(){
-		if (objCamara == null){
-			try{
-				objCamara = Camera.open();
-				parametrosCamara = objCamara.getParameters();
-			} catch (RuntimeException e){
-				Log.e("Camara Al abrir Error: ",e.getMessage());
-			}
-		}
-	}
-
-	private void encenderFlash() {
-		if (objCamara == null || parametrosCamara == null) {
-			return;
-		}
-		parametrosCamara = objCamara.getParameters();
-		if (parametrosCamara == null) {
-			return;
-		}
-		parametrosCamara.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-		objCamara.setParameters(parametrosCamara);
-		objCamara.startPreview();
-	}
-
-	private void apagarFlash() {
-		if (objCamara == null || parametrosCamara == null) {
-			return;
-		}
-		parametrosCamara = objCamara.getParameters();
-		if (parametrosCamara == null) {
-			return;
-		}
-		parametrosCamara.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-		objCamara.setParameters(parametrosCamara);
-		objCamara.stopPreview();
-	}
 
 
 }

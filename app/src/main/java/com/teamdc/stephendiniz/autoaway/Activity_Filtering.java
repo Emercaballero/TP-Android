@@ -84,7 +84,7 @@ public class Activity_Filtering extends ListActivity
 			getActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		isRunning = false;
-		
+
 		infoBundle = getIntent().getExtras();
 		r = getResources();
 
@@ -121,8 +121,10 @@ public class Activity_Filtering extends ListActivity
 			startActivity(getIntent());finish();
 			isRunning = false;
 		}
-		
-	}
+
+
+
+    }
 
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
