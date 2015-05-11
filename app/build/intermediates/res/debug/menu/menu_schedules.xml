@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-    	android:id="@+id/menu_schedules_add"
-    	android:title="@string/menu_schedules_add" />
-
-</menu><!-- From: file:/C:/Proyectos%20Studio/Auto-Away/app/src/main/res/menu/menu_schedules.xml -->
