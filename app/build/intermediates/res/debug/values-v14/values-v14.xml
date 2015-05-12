@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- From: file:/C:/Proyectos%20Studio/Auto-Away/app/src/main/res/values-v14/themes.xml -->
-    <eat-comment/>
-    <style name="HoloDark" parent="@android:style/Theme.DeviceDefault"/>
-    <style name="HoloLight" parent="@android:style/Theme.DeviceDefault.Light"/>
-</resources>
