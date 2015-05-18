@@ -1,4 +1,4 @@
-package com.teamdc.stephendiniz.autoaway;
+package com.teamdc.stephendiniz.autoaway.classes;
 
 import android.hardware.Camera;
 

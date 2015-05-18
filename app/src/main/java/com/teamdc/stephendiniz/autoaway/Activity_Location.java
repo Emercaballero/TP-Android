@@ -12,12 +12,16 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.teamdc.stephendiniz.autoaway.classes.GPS;
+import com.teamdc.stephendiniz.autoaway.classes.Preferences;
 
 import java.util.Calendar;
 
@@ -26,21 +30,26 @@ public class Activity_Location extends Activity implements View.OnClickListener 
 
     private LocationManager locationManager;
     private CheckBox checkBox;
-    private Button button1;
-    private Button button2;
-    private Button button3;
-    private RadioButton radio0;
-    private RadioButton radio1;
-    private RadioButton radio2;
+    private Button saveButton;
+    private Button cancelButton;
+    private Button viewButton;
+    private RadioButton radioGps;
+    private RadioButton radioNetwork;
+    private RadioButton radioNoLocation;
+    RadioGroup locationRadioGroup;
     private TextView text;
     private Calendar cal;
     private String lat;
     private String alt;
     private String acc;
 
+    private String selectedProvider;
+    private Preferences preferences;
+
     SharedPreferences prefs;
     final String THEME_PREF		= "themePreference";
 
+    private GPS gps;
     private LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
 
@@ -74,37 +83,68 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         if (android.os.Build.VERSION.SDK_INT >= 11)
             getActionBar().setDisplayHomeAsUpEnabled(true);
 
+        gps = GPS.getInstance(this);
+        preferences = Preferences.getInstance(this);
+
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0, locationListener);
 
+        selectedProvider = preferences.getSelectedProvider();
+
         setContentView(R.layout.location);
-        button1 = (Button) findViewById(R.id.button1);
-        button2 = (Button) findViewById(R.id.button2);
-        button3 = (Button) findViewById(R.id.button3);
-        button1.setOnClickListener(this);
-        button2.setOnClickListener(this);
-        button3.setOnClickListener(this);
+        saveButton = (Button) findViewById(R.id.button1);
+        cancelButton = (Button) findViewById(R.id.button2);
+        viewButton = (Button) findViewById(R.id.button3);
+        saveButton.setOnClickListener(this);
+        cancelButton.setOnClickListener(this);
+        viewButton.setOnClickListener(this);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        checkBox = (CheckBox) findViewById(R.id.checkBox1);
+
+        checkBox = (CheckBox) findViewById(R.id.locationCheck);
         checkBox.setOnClickListener(this);
-        radio0 = (RadioButton) findViewById(R.id.radio0);
-        radio1 = (RadioButton) findViewById(R.id.radio1);
-        radio2 = (RadioButton) findViewById(R.id.radio2);
-        radio0.setOnClickListener(this);
-        radio1.setOnClickListener(this);
-        radio2.setOnClickListener(this);
+        checkBox.setChecked(preferences.isLocationActivated());
+
+        locationRadioGroup = (RadioGroup) findViewById(R.id.radioGroup1);
+        radioGps = (RadioButton) findViewById(R.id.radioGps);
+        radioNetwork = (RadioButton) findViewById(R.id.radioNetwork);
+        radioNoLocation = (RadioButton) findViewById(R.id.radioNoLocation);
+
+        radioGps.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                selectedProvider = LocationManager.GPS_PROVIDER;
+            }
+        });
+
+        radioNetwork.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                selectedProvider = LocationManager.NETWORK_PROVIDER;
+            }
+        });
+
+        radioNoLocation.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                selectedProvider = null;
+            }
+        });
+
+        Integer selectedProviderId;
+
+        if(LocationManager.NETWORK_PROVIDER.equals(selectedProvider))
+            selectedProviderId = radioNetwork.getId();
+        else if(LocationManager.GPS_PROVIDER.equals(selectedProvider))
+            selectedProviderId = radioGps.getId();
+        else
+            selectedProviderId = radioNoLocation.getId();
+
+        locationRadioGroup.check(selectedProviderId);
+
         text = (TextView) findViewById(R.id.textView1);
     }
 
     private void setButtonState() {
-        boolean isGps = locationManager.isProviderEnabled("gps");
+        boolean isGps = gps.isGPSEnabled();
         checkBox.setChecked(isGps);
-        button1.setEnabled(isGps | radio1.isChecked());
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
+        saveButton.setEnabled(isGps | radioNetwork.isChecked());
     }
 
     @Override
@@ -118,12 +158,12 @@ public class Activity_Location extends Activity implements View.OnClickListener 
     public void onClick(View v) {
         if (v == checkBox)
             clickCheckBox();
-        else if (v == button1)
-            clickButton1();
-        else if (v == button2)
-            clickButton2();
-        else if (v == button3)
-            clickButton3();
+        else if (v == saveButton)
+            clickSaveButton();
+        else if (v == cancelButton)
+            clickCancelButton();
+        else if (v == viewButton)
+            clickViewButton();
         else
             setButtonState(); // for radio buttons
     }
@@ -131,73 +171,41 @@ public class Activity_Location extends Activity implements View.OnClickListener 
     private void clickCheckBox() {
         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         startActivity(intent);
-        checkBox.setChecked(locationManager.isProviderEnabled("gps"));
+        checkBox.setChecked(gps.isGPSEnabled());
     }
 
-    private void clickButton1() { //Boton Save
-        String text;
-        text= "";
-        Location location;
+    private void clickSaveButton() {
+        preferences.setLocationActivated(checkBox.isChecked());
+        preferences.setSelectedProvider(selectedProvider);
 
-        if (radio0.isChecked()) {
-            location = locationManager.getLastKnownLocation("gps");
-        }
-        else if (radio1.isChecked())
-            location = locationManager.getLastKnownLocation("network");
-        else
-            location = null;
-        if (location == null) {
-            if (radio0.isChecked()) {
-                if (locationManager.isProviderEnabled("gps"))
-                    text = "No GPS signal!";
-                else
-                    text = "Turn GPS on!";
-            } else if (radio1.isChecked()) {
-                text = "Network not enabled!";
-            }
-            else
-                text = "";
-        } else {
-            text = (String.format("Lat=%.1f Long=%.1f",location.getLatitude(), location.getAltitude()));
-            SharedPreferences preferencias=getSharedPreferences("datosgps",Context.MODE_PRIVATE);
-            preferencias.edit().putString("text", text).commit();
-        }
+        TextView textView = (TextView) findViewById(R.id.textView1);
+
+        Toast.makeText(this, "Settings saved!", Toast.LENGTH_LONG);
+
         finish();
     }
 
-    private void clickButton2() { //Boton Cancel
+    private void clickCancelButton() {
         finish();
-        return;
     }
 
-    private void clickButton3() { //Boton View
-        TextView textView;
-        textView = (TextView) findViewById(R.id.textView1);
+    private void clickViewButton() {
+        TextView textView = (TextView) findViewById(R.id.textView1);
 
-        Location location;
+        String text = "";
 
-        if (radio0.isChecked()) {
-            location = locationManager.getLastKnownLocation("gps");
-        }
-        else if (radio1.isChecked())
-            location = locationManager.getLastKnownLocation("network");
-        else
-            location = null;
+        Location location = selectedProvider == null ? null : gps.getCurrentLocation(selectedProvider);
+
         if (location == null) {
-            if (radio0.isChecked()) {
-                if (locationManager.isProviderEnabled("gps"))
-                    textView.setText("No GPS signal!");
-                else
-                    textView.setText("Turn GPS on!");
-            } else if (radio1.isChecked()) {
-                textView.setText("Network not enabled!");
+            if (radioGps.isChecked()) {
+                text = gps.isGPSEnabled() ? "No GPS signal!" : "Turn GPS on!";
+            } else if (radioNetwork.isChecked()) {
+                text = "No network signal!";
             }
-            else
-                textView.setText("");
         } else {
-            textView.setText(String.format("Latitude = %.1f\nLongitude = %.1f\n",
-                    location.getLatitude(), location.getAltitude()));
-
+            text = String.format("Lat=%.1f Long=%.1f",location.getLatitude(), location.getLongitude());
         }
+
+        textView.setText(text);
     }
 }

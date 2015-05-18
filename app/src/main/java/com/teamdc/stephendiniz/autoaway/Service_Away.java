@@ -11,7 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.hardware.Camera;
+import android.location.Location;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,7 +26,10 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.teamdc.stephendiniz.autoaway.classes.Camara;
+import com.teamdc.stephendiniz.autoaway.classes.GPS;
 import com.teamdc.stephendiniz.autoaway.classes.LogEntry;
+import com.teamdc.stephendiniz.autoaway.classes.Preferences;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -96,8 +99,10 @@ public class Service_Away extends Service
 
 	//linterna
     private Camara camara = Camara.getInstance();
+    private GPS gps;
+    private Preferences preferences;
 
-	public void onStart(Intent intent, int startId)
+    public void onStart(Intent intent, int startId)
 	{
 		super.onStart(intent, startId);
 
@@ -122,6 +127,8 @@ public class Service_Away extends Service
 		pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Auto-Away");
 
+        gps = GPS.getInstance(this);
+        preferences = Preferences.getInstance(this);
         sentPI = PendingIntent.getBroadcast(this, 0, new Intent("android.provider.Telephony.SMS_SENT"), 0);
 		aManager = (AudioManager)getBaseContext().getSystemService(Context.AUDIO_SERVICE);
 		
@@ -316,24 +323,22 @@ public class Service_Away extends Service
 		wakeLock.acquire();
 		Log.d(TAG, "Wake Lock Acquired!");
 
-		if (getMessageContent(getInformStatus()).length() > 160)
-		{
-			ArrayList<String> messagelist = manager.divideMessage(getMessageContent(getInformStatus()));
+        String content = getMessageContent(getInformStatus());
 
+        if (content.length() > 160) {
+			ArrayList<String> messagelist = manager.divideMessage(content);
 			manager.sendMultipartTextMessage(getReturnAddress(), null, messagelist, null, null);
-			//Activar Luz de la camara dos veces
-            camara.hacerGuinio(2);
-			Log.i(TAG, "Multipart Text Message Sent!");
-		}
-		else
-		{
-			manager.sendTextMessage(getReturnAddress(), null, getMessageContent(getInformStatus()), sentPI, null);
-			//Activar Luz de la camara dos veces
-            camara.hacerGuinio(2);
+
+            Log.i(TAG, "Multipart Text Message Sent!");
+		} else {
+			manager.sendTextMessage(getReturnAddress(), null, content, sentPI, null);
             Log.i(TAG, "Text Message Sent!");
 		}
-		
-		wakeLock.release();
+
+        //Activar Luz de la camara dos veces
+        camara.hacerGuinio(2);
+
+        wakeLock.release();
 		Log.d(TAG, "Wake Lock Released!");
 	}
 	
@@ -667,14 +672,15 @@ public class Service_Away extends Service
 	public void setCallText(int callText)					{ this.callText = callText;											}
 	
 	public String getMessageContent(boolean status) {
-		SharedPreferences preferencias=getSharedPreferences("datosgps", Context.MODE_PRIVATE);
-		String text;
-		text = preferencias.getString("text","");
-		if (status) {
-			return "[Auto-Away]: " + messageContent + " " + text;
-		}
-		return messageContent + " " + text;
+		boolean isLocationActivated = preferences.isLocationActivated();
+        String provider = preferences.getSelectedProvider();
+
+        Location currentLocation = gps.getCurrentLocation(provider);
+		String prefix = status ? "[Auto-Away]: " : "";
+
+        return prefix + messageContent + " " + currentLocation;
 	}
+
 	public void setMessageContent(String messageContent)	{ this.messageContent = messageContent;								}
 
 	public boolean getInformStatus()						{ return informStatus;												}

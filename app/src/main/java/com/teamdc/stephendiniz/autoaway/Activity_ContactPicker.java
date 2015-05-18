@@ -103,7 +103,7 @@ public class Activity_ContactPicker extends ListActivity
 		//Checks contacts for the number passed (returnAddress)
 		while (cursor.moveToNext())
 		{
-			int num = Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
+			int num = cursor.getInt(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
 			if (num > 0)
 			{

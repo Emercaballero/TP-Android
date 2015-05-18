@@ -18,24 +18,24 @@
         android:id="@+id/radioGroup1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-          android:layout_alignTop="@+id/checkBox1"
+          android:layout_alignTop="@+id/locationCheck"
           android:layout_centerHorizontal="true">
 
         <RadioButton
-            android:id="@+id/radio0"
+            android:id="@+id/radioGps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
             android:text="GPS" />
 
         <RadioButton
-            android:id="@+id/radio1"
+            android:id="@+id/radioNetwork"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Network" />
 
           <RadioButton
-              android:id="@+id/radio2"
+              android:id="@+id/radioNoLocation"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:text="Sin Localizacion"
@@ -43,7 +43,7 @@
       </RadioGroup>
 
     <CheckBox
-        android:id="@+id/checkBox1"
+        android:id="@+id/locationCheck"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="GPS"
