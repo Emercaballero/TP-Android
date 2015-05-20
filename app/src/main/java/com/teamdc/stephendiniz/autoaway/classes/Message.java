@@ -30,4 +30,9 @@ public class Message implements Listable {
         this.title = title;
         this.content = content;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s [%s]", title, content);
+    }
 }

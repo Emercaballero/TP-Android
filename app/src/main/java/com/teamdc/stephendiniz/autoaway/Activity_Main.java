@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -43,13 +44,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.teamdc.stephendiniz.autoaway.classes.Message;
+import com.teamdc.stephendiniz.autoaway.classes.MessageService;
 
 public class Activity_Main extends PreferenceActivity implements OnPreferenceChangeListener, OnPreferenceClickListener
 {
 
 	private static final String	TAG = "Main";
-	private static final String messagesFile = "awayMessages.txt";
-	
+
 	final String SERVICE_PREF	= "serviceCheckBox";
 	final String SILENT_PREF	= "silentCheckBox";
 	final String CALLTEXT_PREF	= "callTextListPref";
@@ -79,6 +80,8 @@ public class Activity_Main extends PreferenceActivity implements OnPreferenceCha
 	Preference 			logPreference;
 	CheckBoxPreference 	logCheckBox;
 
+
+
 	ListPreference 		messageListPref;
 	ListPreference		filteringListPref;
 	CheckBoxPreference 	informCheckBox;
@@ -98,6 +101,8 @@ public class Activity_Main extends PreferenceActivity implements OnPreferenceCha
 	SharedPreferences prefs;
 	SharedPreferences.Editor editor;
 
+    private MessageService messageService;
+
 	static final int LOG_DIALOG_ID = 0;
 	static final int FILTERING_DIALOG_ID = 1;
 	
@@ -115,13 +120,16 @@ public class Activity_Main extends PreferenceActivity implements OnPreferenceCha
 	static final int CALLTEXT_CALL	= 1;
 	static final int CALLTEXT_TEXT	= 2;
 
-	private ArrayList<Message> messages = new ArrayList<Message>();
+	private List<Message> messages = new ArrayList<Message>();
 
 	@SuppressLint("NewApi")
 	public void onCreate (Bundle savedInstanceState)
 	{
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		editor = prefs.edit();
+        messageService = new MessageService(this);
+
+        r = this.getResources();
 
 		if(android.os.Build.VERSION.SDK_INT >= 14)
 		{
@@ -163,7 +171,11 @@ public class Activity_Main extends PreferenceActivity implements OnPreferenceCha
 		bUCheckPreference	= new Preference(this);
 
 		// Load Custom Messages and Generate Drop Down Lists
-		messagesExist(messagesFile);
+
+        messages = messageService.readMessagesFromFile();
+        Message defaultMessage = new Message(r.getString(R.string.default_message_title), r.getString(R.string.default_message_content));
+        messages.add(defaultMessage);
+
 		createListPreferences(false);
 	}
 	
@@ -183,8 +195,9 @@ public class Activity_Main extends PreferenceActivity implements OnPreferenceCha
 		
 		if(!prefs.getBoolean(BUCHECK_PREF, false))
 			restorePreference.setEnabled(false);
-		
-		messagesExist(messagesFile);
+
+        messages = messageService.readMessagesFromFile();
+
 		createListPreferences(true);
 	}
 
@@ -361,44 +374,6 @@ public class Activity_Main extends PreferenceActivity implements OnPreferenceCha
 		return true;
 	}
 
-	public boolean messagesExist(String file)
-	{
-		r = getResources();
-		messages.removeAll(messages);
-		
-		Message defaultMessage = new Message(r.getString(R.string.default_message_title), r.getString(R.string.default_message_content));
-		messages.add(defaultMessage);
-		
-		try
-		{
-			File inFile = getBaseContext().getFileStreamPath(file);
-			
-			if (inFile.exists())
-			{
-				InputStream iStream = openFileInput(file);
-				InputStreamReader iReader = new InputStreamReader(iStream);
-				BufferedReader bReader = new BufferedReader(iReader);
-				
-				String line;
-				
-				//Should ALWAYS be in groups of two
-				while((line = bReader.readLine()) != null)
-				{
-					Message messageFromFile = new Message(line, bReader.readLine());
-					messages.add(messageFromFile);
-				}
-				
-				iStream.close();
-			}
-		}
-		catch (java.io.FileNotFoundException exception) { Log.e(TAG, "FileNotFoundException caused by openFileInput(fileName)", exception); }
-		catch (IOException exception) 					{ Log.e(TAG, "IOException caused by buffreader.readLine()", exception); 			}
-		
-		if(messages.isEmpty())
-			return false;
-		
-		return true;
-	}
 	public void createListPreferences(boolean justMessages)
 	{
 		if(!justMessages)

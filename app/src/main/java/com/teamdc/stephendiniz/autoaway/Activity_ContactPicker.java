@@ -1,10 +1,5 @@
 package com.teamdc.stephendiniz.autoaway;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,8 +89,8 @@ public class Activity_ContactPicker extends ListActivity
 		}
 
 		setTitle(r.getString(R.string.pref_contacts_title));
-		
-		grabNumbers(getFile());
+
+        contacts = contactService.readContactsFromFile(file);
 
         pContacts = contactService.getAllPhoneContacts();
 
@@ -130,67 +125,11 @@ public class Activity_ContactPicker extends ListActivity
 			showTheMessage(FILTERING_ADDED, name);
 
 		contactService.sortContactsByName(contacts);
-		saveNumbers(getFile());	
+        contactService.saveContactsToFile(file, contacts);
+
 		finish();
 	}
-	
-	public boolean grabNumbers(String file)
-	{
-		int numOfContacts = 0;
 
-		contacts.removeAll(contacts);
-		
-		File inFile = getBaseContext().getFileStreamPath(getFile());
-
-		if (inFile.exists())
-		{
-			try
-			{
-				InputStream iStream = openFileInput(file);
-				InputStreamReader iReader = new InputStreamReader(iStream);
-				BufferedReader bReader = new BufferedReader(iReader);
-				
-				String line;
-				//Should be in groups of TWO!
-				while((line = bReader.readLine()) != null)
-				{
-					Contact contactFromFile = new Contact(line, bReader.readLine());
-					contacts.add(contactFromFile);
-					numOfContacts++;
-				}
-				
-				iStream.close();
-				
-				Log.i(TAG, numOfContacts + " contact(s) read from file");
-			}
-			catch (java.io.FileNotFoundException exception) { Log.e(TAG, "FileNotFoundException caused by " + getFile(), exception);	}
-			catch (IOException exception) 					{ Log.e(TAG, "IOException caused by buffreader.readLine()", exception); 	}
-					
-			if(contacts.isEmpty())
-				return false;
-		}
-		
-		return true;
-	}
-	
-	public void saveNumbers(String file)
-	{
-		try
-		{
-			OutputStreamWriter oWriter = new OutputStreamWriter(openFileOutput(file, 0));
-			
-			for(int i = 0; i < contacts.size(); i++)
-			{
-				oWriter.append(contacts.get(i).getName() + "\n");
-				oWriter.append(contacts.get(i).getNumber() + "\n");
-			}
-		
-		oWriter.flush();
-		oWriter.close();
-		}
-		catch (java.io.IOException exception) { Log.e(TAG, "IOException caused by trying to access " + getFile(), exception); };
-	}
-	
 	public void showTheMessage(int id, String extra) {
 		String message;
 

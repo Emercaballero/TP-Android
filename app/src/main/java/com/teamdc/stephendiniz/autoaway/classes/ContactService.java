@@ -4,9 +4,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import com.teamdc.stephendiniz.autoaway.R;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,6 +23,7 @@ import static com.teamdc.stephendiniz.autoaway.classes.Utils.*;
  */
 public class ContactService {
 
+    private static final String TAG = "ContactService";
     private Context context;
 
     private final String MULTIPLE_NUMBERS;
@@ -121,6 +126,45 @@ public class ContactService {
                 return lhs.getName().compareTo(rhs.getName());
             }
         });
+    }
+
+    public List<Contact> readContactsFromFile(String filePath) {
+
+        List<Contact> contacts = new ArrayList<Contact>();
+
+        File inFile = context.getFileStreamPath(filePath);
+
+        if (inFile.exists()) {
+            try {
+
+                contacts = readFile(filePath, context.openFileInput(filePath), new RegisterDeserializer<Contact>() {
+                    public Contact deserialize(String line) {
+                        String[] split = line.split(",");
+                        return new Contact(split[0], split[1]);
+                    }
+                });
+
+            } catch (java.io.FileNotFoundException exception) {
+                Log.e(TAG, "FileNotFoundException caused by " + filePath, exception);
+            } catch (IOException exception) {
+                Log.e(TAG, "IOException caused by buffreader.readLine()", exception);
+            }
+
+        }
+
+        return contacts;
+    }
+
+    public void saveContactsToFile(String filePath, List<Contact> contacts){
+        try {
+            saveToFile(filePath, context.openFileOutput(filePath, 0), contacts, new RegisterSerializer<Contact>() {
+                public String serialize(Contact object) {
+                    return String.format("%s,%s", object.getName(), object.getNumber());
+                }
+            });
+        } catch (IOException e) {
+            Log.e(TAG, "IOException caused by trying to access " + filePath, e);
+        }
     }
 
 }

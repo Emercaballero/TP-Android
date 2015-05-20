@@ -35,138 +35,129 @@ import com.teamdc.stephendiniz.autoaway.classes.MessageListArrayAdapter;
 
 import static com.teamdc.stephendiniz.autoaway.classes.Utils.*;
 
-public class Activity_Filtering extends ListActivity
-{
-	private static final String	TAG = "Filtering";
+public class Activity_Filtering extends ListActivity {
+    private static final String TAG = "Filtering";
 
-	private int filterStatus;
-	private String file;
-	
-	private List<Contact> contacts = new ArrayList<Contact>();
+    private int filterStatus;
+    private String file;
+
+    private List<Contact> contacts = new ArrayList<Contact>();
 
     private ContactService contactService;
 
-	Resources r;
-	Dialog dialog;
-	private Bundle infoBundle;
-	private Boolean isRunning = false;
-	
-	SharedPreferences prefs;
-	
-	final String THEME_PREF		= "themePreference";
+    Resources r;
+    Dialog dialog;
+    private Bundle infoBundle;
+    private Boolean isRunning = false;
 
-	private final int FILTER_BLACKLIST = 2;
-	private final int FILTER_WHITELIST = 3;
+    SharedPreferences prefs;
 
-	static final int FILTERING_ERROR_EXISTS	= 0;
-	static final int FILTERING_ERROR_NUMBER	= 1;
-	static final int FILTERING_ADDED		= 2;
-	static final int FILTERING_SAVED		= 3;
-	static final int FILTERING_BLANK		= 4;
+    final String THEME_PREF = "themePreference";
 
-	static final int CONTEXT_MENU_EDIT		= 0;
-	static final int CONTEXT_MENU_REMOVE	= 1;
-	
-	@SuppressLint("NewApi")
-	public void onCreate(Bundle savedInstanceState)
-	{
-		prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    private final int FILTER_BLACKLIST = 2;
+    private final int FILTER_WHITELIST = 3;
+
+    static final int FILTERING_ERROR_EXISTS = 0;
+    static final int FILTERING_ERROR_NUMBER = 1;
+    static final int FILTERING_ADDED = 2;
+    static final int FILTERING_SAVED = 3;
+    static final int FILTERING_BLANK = 4;
+
+    static final int CONTEXT_MENU_EDIT = 0;
+    static final int CONTEXT_MENU_REMOVE = 1;
+
+    @SuppressLint("NewApi")
+    public void onCreate(Bundle savedInstanceState) {
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         contactService = new ContactService(this);
 
-		if(android.os.Build.VERSION.SDK_INT >= 14)
-		{
-			if(prefs.getString(THEME_PREF, "LIGHT").equals("LIGHT"))
-				setTheme(R.style.HoloLight);
-			else
-				setTheme(R.style.HoloDark);
-		}
-		
-		super.onCreate(savedInstanceState);
+        if (android.os.Build.VERSION.SDK_INT >= 14) {
+            if (prefs.getString(THEME_PREF, "LIGHT").equals("LIGHT"))
+                setTheme(R.style.HoloLight);
+            else
+                setTheme(R.style.HoloDark);
+        }
 
-		if (android.os.Build.VERSION.SDK_INT >= 11)
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-		
-		isRunning = false;
+        super.onCreate(savedInstanceState);
 
-		infoBundle = getIntent().getExtras();
-		r = getResources();
+        if (android.os.Build.VERSION.SDK_INT >= 11)
+            getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		setFilterStatus(infoBundle.getInt("extraFilterStatus"));
+        isRunning = false;
 
-		switch(getFilterStatus())
-		{
-			case FILTER_BLACKLIST:
-				setFile("filtering_blacklist.txt");
-				setTitle(r.getString(R.string.pref_filter_type_3));
-			break;
-			
-			case FILTER_WHITELIST:
-				setFile("filtering_whitelist.txt");
-				setTitle(r.getString(R.string.pref_filter_type_4));
-			break;
-		}
+        infoBundle = getIntent().getExtras();
+        r = getResources();
 
-		grabNumbers(getFile());
+        setFilterStatus(infoBundle.getInt("extraFilterStatus"));
 
-		setListAdapter(new MessageListArrayAdapter(this, asListable(contacts)));
-		
-		registerForContextMenu(getListView());
-	}
+        switch (getFilterStatus()) {
+            case FILTER_BLACKLIST:
+                setFile("filtering_blacklist.txt");
+                setTitle(r.getString(R.string.pref_filter_type_3));
+                break;
 
-	public void onResume()
-	{
-		super.onResume();
-		
-		if (isRunning)
-		{
-			grabNumbers(getFile());
-			startActivity(getIntent());finish();
-			isRunning = false;
-		}
+            case FILTER_WHITELIST:
+                setFile("filtering_whitelist.txt");
+                setTitle(r.getString(R.string.pref_filter_type_4));
+                break;
+        }
 
+        contacts = contactService.readContactsFromFile(file);
+//        grabNumbers(getFile());
+
+        setListAdapter(new MessageListArrayAdapter(this, asListable(contacts)));
+
+        registerForContextMenu(getListView());
+    }
+
+    public void onResume() {
+        super.onResume();
+
+        if (isRunning) {
+            contacts = contactService.readContactsFromFile(file);
+            startActivity(getIntent());
+            finish();
+            isRunning = false;
+        }
 
 
     }
 
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu_filtering, menu);
-		
-		return true;
-	}
-	public boolean onOptionsItemSelected(MenuItem item) 
-	{
-		switch(item.getItemId())
-		{
-			case R.id.filtering_contact_add:
-				Intent intent = new Intent(this, Activity_ContactPicker.class);
-				
-				intent.putExtra("extraFilterStatus", getFilterStatus());
-				
-				startActivity(intent);
-				isRunning = true;
-			break;
-			
-			case R.id.filtering_contact_addCustom:
-				dialog = new Dialog(this);
-				
-				dialog.setContentView(R.layout.filtering_add);
-				dialog.setTitle(r.getString(R.string.prompt_filter_title));
-				
-				Button pButton = (Button)dialog.findViewById(R.id.dialog_filteringButtonPositive_add);
-				pButton.setOnClickListener(new View.OnClickListener()
-				{
-					public void onClick(View v)
-					{
-						EditText eName = (EditText)dialog.findViewById(R.id.dialog_filteringNameEdit_add);
-						EditText eNumber = (EditText)dialog.findViewById(R.id.dialog_filteringNumberEdit_add);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_filtering, menu);
+
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.filtering_contact_add:
+                Intent intent = new Intent(this, Activity_ContactPicker.class);
+
+                intent.putExtra("extraFilterStatus", getFilterStatus());
+
+                startActivity(intent);
+                isRunning = true;
+                break;
+
+            case R.id.filtering_contact_addCustom:
+                dialog = new Dialog(this);
+
+                dialog.setContentView(R.layout.filtering_add);
+                dialog.setTitle(r.getString(R.string.prompt_filter_title));
+
+                Button pButton = (Button) dialog.findViewById(R.id.dialog_filteringButtonPositive_add);
+                pButton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        EditText eName = (EditText) dialog.findViewById(R.id.dialog_filteringNameEdit_add);
+                        EditText eNumber = (EditText) dialog.findViewById(R.id.dialog_filteringNumberEdit_add);
 
                         String name = eName.getText().toString();
                         String number = eNumber.getText().toString();
 
-                        if(name == null || "".equals(name) || number == null || "".equals(number)){
+                        if (name == null || "".equals(name) || number == null || "".equals(number)) {
                             showTheMessage(FILTERING_BLANK, null);
                         } else if (contactService.contactExists(contacts, name)) {
                             showTheMessage(FILTERING_ERROR_EXISTS, null);
@@ -179,170 +170,162 @@ public class Activity_Filtering extends ListActivity
                             saveNumbers(getFile());
                             startActivity(getIntent());
                             finish();
-							}
-						}
-				});
-				
-				Button nButton = (Button)dialog.findViewById(R.id.dialog_filteringButtonNegative_add);
-				nButton.setOnClickListener(new View.OnClickListener()
-				{
-					public void onClick(View v)
-					{
-						dialog.cancel();
-					}
-				});
-				
-				dialog.show();
-			break;
-			
-			case R.id.filtering_contact_removeAll:
-				contacts.removeAll(contacts);
-				saveNumbers(getFile());
-				startActivity(getIntent());
+                        }
+                    }
+                });
+
+                Button nButton = (Button) dialog.findViewById(R.id.dialog_filteringButtonNegative_add);
+                nButton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        dialog.cancel();
+                    }
+                });
+
+                dialog.show();
+                break;
+
+            case R.id.filtering_contact_removeAll:
+                contacts.removeAll(contacts);
+                saveNumbers(getFile());
+                startActivity(getIntent());
                 finish();
-			break;
-			case android.R.id.home:
-	            Intent parentActivityIntent = new Intent(this, Activity_Main.class);
-	            parentActivityIntent.addFlags(
-	                    Intent.FLAG_ACTIVITY_CLEAR_TOP |
-	                    Intent.FLAG_ACTIVITY_NEW_TASK);
-	            startActivity(parentActivityIntent);
-	            finish();
-	        return true;
-		}
-		
-		return true;
-	}
+                break;
+            case android.R.id.home:
+                Intent parentActivityIntent = new Intent(this, Activity_Main.class);
+                parentActivityIntent.addFlags(
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                                Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(parentActivityIntent);
+                finish();
+                return true;
+        }
 
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
-	{
-		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
-		menu.setHeaderTitle(contacts.get(info.position).getName());
-		String[] menuItems = {	r.getString(R.string.menu_edit),
-								r.getString(R.string.menu_remove)	};
+        return true;
+    }
 
-		for (int i = 0; i < menuItems.length; i++)
-			menu.add(Menu.NONE, i, i, menuItems[i]);
-	}
-	
-	public boolean onContextItemSelected(MenuItem item)
-	{
-	  AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-	  int menuItemIndex = item.getItemId();
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        menu.setHeaderTitle(contacts.get(info.position).getName());
+        String[] menuItems = {r.getString(R.string.menu_edit),
+                r.getString(R.string.menu_remove)};
 
-	  final int iId = info.position;
-	  switch(menuItemIndex)
-	  {
-	  	case CONTEXT_MENU_EDIT:
-	  		dialog = new Dialog(this);
-			
-			dialog.setContentView(R.layout.filtering_edit);
-			dialog.setTitle(r.getString(R.string.menu_edit) + " " + contacts.get(iId).getName());
-			
-			Button pButton = (Button)dialog.findViewById(R.id.dialog_filteringButtonPositive_edit);
-			pButton.setOnClickListener(new View.OnClickListener()
-			{
-				public void onClick(View v)
-				{
-					EditText eName = (EditText)dialog.findViewById(R.id.dialog_filteringNameEdit_edit);
-					EditText eNumber = (EditText)dialog.findViewById(R.id.dialog_filteringNumberEdit_edit);
-					
-					if(eName.getText().toString().equals("") || eName.getText().toString().equals(null) || eNumber.getText().toString().equals("") || eNumber.getText().toString().equals(null))
-						showTheMessage(FILTERING_BLANK, null);
+        for (int i = 0; i < menuItems.length; i++)
+            menu.add(Menu.NONE, i, i, menuItems[i]);
+    }
 
-					else
-					{
-						if((contacts.get(iId).getName().equals(eName.getText().toString())) && (contacts.get(iId).getNumber().equals(hyphenatePhoneNumber(eNumber.getText().toString()))))
-							dialog.cancel();
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int menuItemIndex = item.getItemId();
 
-						else
-						{
-							contacts.get(iId).setInfo(eName.getText().toString().trim(), hyphenatePhoneNumber(eNumber.getText().toString().trim()));
-							showTheMessage(FILTERING_SAVED, eName.getText().toString().trim());
-							dialog.cancel();
-							saveNumbers(getFile());
-							
-							Log.i(TAG, "\"" + contacts.get(iId).getName() + "\" edited successfully");
-							startActivity(getIntent()); finish();
-						}
-					}
-				}
-			});
-			
-			Button nButton = (Button)dialog.findViewById(R.id.dialog_filteringButtonNegative_edit);
-			nButton.setOnClickListener(new View.OnClickListener()
-			{
-				public void onClick(View v)
-				{
-					dialog.cancel();
-				}
-			});
-			
-			dialog.show();
-			pButton.setText(r.getString(R.string.menu_save));
-			EditText eTitle = (EditText)dialog.findViewById(R.id.dialog_filteringNameEdit_edit);
-			eTitle.setText(contacts.get(iId).getName());
-			EditText eContent = (EditText)dialog.findViewById(R.id.dialog_filteringNumberEdit_edit);
-			eContent.setText(dehyphenate(contacts.get(iId).getNumber()));
-	  	break;
-	  	case CONTEXT_MENU_REMOVE:
-	  		contacts.remove(info.position);
-	  		saveNumbers(getFile());
-			startActivity(getIntent()); finish();
-	  	break;
-	  }
-	  return true;
-	}
+        final int iId = info.position;
+        switch (menuItemIndex) {
+            case CONTEXT_MENU_EDIT:
+                dialog = new Dialog(this);
 
-	public boolean grabNumbers(String file) {
-		contacts.clear();
+                dialog.setContentView(R.layout.filtering_edit);
+                dialog.setTitle(r.getString(R.string.menu_edit) + " " + contacts.get(iId).getName());
 
-		try {
-			File inFile = getBaseContext().getFileStreamPath(getFile());
+                Button pButton = (Button) dialog.findViewById(R.id.dialog_filteringButtonPositive_edit);
+                pButton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        EditText eName = (EditText) dialog.findViewById(R.id.dialog_filteringNameEdit_edit);
+                        EditText eNumber = (EditText) dialog.findViewById(R.id.dialog_filteringNumberEdit_edit);
 
-			if (inFile.exists()) {
-				InputStream iStream = openFileInput(getFile());
-				InputStreamReader iReader = new InputStreamReader(iStream);
-				BufferedReader bReader = new BufferedReader(iReader);
+                        if (eName.getText().toString().equals("") || eName.getText().toString().equals(null) || eNumber.getText().toString().equals("") || eNumber.getText().toString().equals(null))
+                            showTheMessage(FILTERING_BLANK, null);
 
-				String line;
-				//Should be in groups of TWO!
-				while((line = bReader.readLine()) != null) {
-					Contact contactFromFile = new Contact(line, bReader.readLine());
-					contacts.add(contactFromFile);
-				}
+                        else {
+                            if ((contacts.get(iId).getName().equals(eName.getText().toString())) && (contacts.get(iId).getNumber().equals(hyphenatePhoneNumber(eNumber.getText().toString()))))
+                                dialog.cancel();
 
-				iStream.close();
+                            else {
+                                contacts.get(iId).setInfo(eName.getText().toString().trim(), hyphenatePhoneNumber(eNumber.getText().toString().trim()));
+                                showTheMessage(FILTERING_SAVED, eName.getText().toString().trim());
+                                dialog.cancel();
+                                saveNumbers(getFile());
 
-				Log.i(TAG, contacts.size() + " contacts(s) read from file");
-			}
-			else
-				Log.w(TAG, "\"" + getFile() + "\" was not found!");
-		}
-		catch (java.io.FileNotFoundException exception) { Log.e(TAG, "FileNotFoundException caused by openFileInput(fileName)", exception); }
-		catch (IOException exception) 					{ Log.e(TAG, "IOException caused by buffreader.readLine()", exception); 			}
+                                Log.i(TAG, "\"" + contacts.get(iId).getName() + "\" edited successfully");
+                                startActivity(getIntent());
+                                finish();
+                            }
+                        }
+                    }
+                });
 
-		return !contacts.isEmpty();
-	}
-	
-	public void saveNumbers(String file){
+                Button nButton = (Button) dialog.findViewById(R.id.dialog_filteringButtonNegative_edit);
+                nButton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        dialog.cancel();
+                    }
+                });
+
+                dialog.show();
+                pButton.setText(r.getString(R.string.menu_save));
+                EditText eTitle = (EditText) dialog.findViewById(R.id.dialog_filteringNameEdit_edit);
+                eTitle.setText(contacts.get(iId).getName());
+                EditText eContent = (EditText) dialog.findViewById(R.id.dialog_filteringNumberEdit_edit);
+                eContent.setText(dehyphenate(contacts.get(iId).getNumber()));
+                break;
+            case CONTEXT_MENU_REMOVE:
+                contacts.remove(info.position);
+                saveNumbers(getFile());
+                startActivity(getIntent());
+                finish();
+                break;
+        }
+        return true;
+    }
+
+    public boolean grabNumbers(String file) {
+        contacts.clear();
+
+        try {
+            File inFile = getBaseContext().getFileStreamPath(getFile());
+
+            if (inFile.exists()) {
+                InputStream iStream = openFileInput(getFile());
+                InputStreamReader iReader = new InputStreamReader(iStream);
+                BufferedReader bReader = new BufferedReader(iReader);
+
+                String line;
+                //Should be in groups of TWO!
+                while ((line = bReader.readLine()) != null) {
+                    Contact contactFromFile = new Contact(line, bReader.readLine());
+                    contacts.add(contactFromFile);
+                }
+
+                iStream.close();
+
+                Log.i(TAG, contacts.size() + " contacts(s) read from file");
+            } else
+                Log.w(TAG, "\"" + getFile() + "\" was not found!");
+        } catch (java.io.FileNotFoundException exception) {
+            Log.e(TAG, "FileNotFoundException caused by openFileInput(fileName)", exception);
+        } catch (IOException exception) {
+            Log.e(TAG, "IOException caused by buffreader.readLine()", exception);
+        }
+
+        return !contacts.isEmpty();
+    }
+
+    public void saveNumbers(String file) {
         OutputStreamWriter oWriter = null;
-        try{
+        try {
 
             oWriter = new OutputStreamWriter(openFileOutput(file, 0));
 
-            for(Contact contact : contacts){
+            for (Contact contact : contacts) {
                 oWriter.append(contact.getName() + "\n");
                 oWriter.append(contact.getNumber() + "\n");
             }
 
-		} catch (IOException exception) {
+        } catch (IOException exception) {
             Log.e(TAG, "IOException caused by trying to access " + file, exception);
         } finally {
 
             try {
 
-                if(oWriter != null){
+                if (oWriter != null) {
                     oWriter.flush();
                     oWriter.close();
                 }
@@ -351,42 +334,50 @@ public class Activity_Filtering extends ListActivity
             }
 
         }
-	}
-	
-	public void showTheMessage(int id, String extra)
-	{
-		String message = "";
+    }
 
-		switch(id)
-		{
-			case FILTERING_ERROR_NUMBER:
-				message = r.getString(R.string.prompt_error_filter_number);
-			break;
-			
-			case FILTERING_ERROR_EXISTS:
-				message = r.getString(R.string.prompt_error_filter_exists);
-			break;
-			
-			case FILTERING_ADDED:
-				message = "\'" + extra + "\'" + " " + r.getString(R.string.prompt_added);
-			break;
-			
-			case FILTERING_BLANK:
-				message = r.getString(R.string.prompt_error_filter_blank);
-			break;
-			
-			case FILTERING_SAVED:
-				message = "\'" + extra + "\'" + " " + r.getString(R.string.prompt_message_saved);
-			break;
-		}
-		
-		Toast eToast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
-		eToast.show();
-	}
+    public void showTheMessage(int id, String extra) {
+        String message = "";
 
-	public int getFilterStatus()						{ return filterStatus; 					}
-	public void setFilterStatus(int filterStatus)		{ this.filterStatus = filterStatus;		}
-	
-	public String getFile()								{ return file;							}
-	public void setFile(String file)					{ this.file = file;						}
+        switch (id) {
+            case FILTERING_ERROR_NUMBER:
+                message = r.getString(R.string.prompt_error_filter_number);
+                break;
+
+            case FILTERING_ERROR_EXISTS:
+                message = r.getString(R.string.prompt_error_filter_exists);
+                break;
+
+            case FILTERING_ADDED:
+                message = "\'" + extra + "\'" + " " + r.getString(R.string.prompt_added);
+                break;
+
+            case FILTERING_BLANK:
+                message = r.getString(R.string.prompt_error_filter_blank);
+                break;
+
+            case FILTERING_SAVED:
+                message = "\'" + extra + "\'" + " " + r.getString(R.string.prompt_message_saved);
+                break;
+        }
+
+        Toast eToast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+        eToast.show();
+    }
+
+    public int getFilterStatus() {
+        return filterStatus;
+    }
+
+    public void setFilterStatus(int filterStatus) {
+        this.filterStatus = filterStatus;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
+    }
 }
