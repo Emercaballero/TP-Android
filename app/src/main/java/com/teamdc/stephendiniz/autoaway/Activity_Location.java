@@ -28,7 +28,6 @@ import java.util.Calendar;
 
 public class Activity_Location extends Activity implements View.OnClickListener {
 
-    private LocationManager locationManager;
     private CheckBox checkBox;
     private Button saveButton;
     private Button cancelButton;
@@ -86,9 +85,6 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         gps = GPS.getInstance(this);
         preferences = Preferences.getInstance(this);
 
-        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0, locationListener);
-
         selectedProvider = preferences.getSelectedProvider();
 
         setContentView(R.layout.location);
@@ -98,7 +94,6 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         saveButton.setOnClickListener(this);
         cancelButton.setOnClickListener(this);
         viewButton.setOnClickListener(this);
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         checkBox = (CheckBox) findViewById(R.id.locationCheck);
         checkBox.setOnClickListener(this);
@@ -180,7 +175,7 @@ public class Activity_Location extends Activity implements View.OnClickListener 
 
         TextView textView = (TextView) findViewById(R.id.textView1);
 
-        Toast.makeText(this, "Settings saved!", Toast.LENGTH_LONG);
+        Toast.makeText(this, "Settings saved!", Toast.LENGTH_LONG).show();
 
         finish();
     }

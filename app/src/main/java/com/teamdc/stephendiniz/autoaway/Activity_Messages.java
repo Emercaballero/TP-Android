@@ -76,8 +76,8 @@ public class Activity_Messages extends ListActivity
 		
 		messagesExist(messagesFile);
 		
-		MessageListArrayAdapter adapter = new MessageListArrayAdapter(this, sTitle, sContent);
-		setListAdapter(adapter);
+//		MessageListArrayAdapter adapter = new MessageListArrayAdapter(this, sTitle, sContent);
+//		setListAdapter(adapter);
 		
 		registerForContextMenu(getListView());
 	}

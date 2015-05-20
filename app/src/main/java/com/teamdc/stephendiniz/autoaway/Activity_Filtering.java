@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.teamdc.stephendiniz.autoaway.R;
 import com.teamdc.stephendiniz.autoaway.classes.Contact;
 import com.teamdc.stephendiniz.autoaway.classes.MessageListArrayAdapter;
+import com.teamdc.stephendiniz.autoaway.classes.MessageListContactArrayAdapter;
 
 public class Activity_Filtering extends ListActivity
 {
@@ -104,9 +105,8 @@ public class Activity_Filtering extends ListActivity
 		}
 
 		grabNumbers(getFile());
-		
-		MessageListArrayAdapter adapter = new MessageListArrayAdapter(this, sNames, sNumbers);
-		setListAdapter(adapter);
+
+		setListAdapter(new MessageListContactArrayAdapter(this, contacts));
 		
 		registerForContextMenu(getListView());
 	}

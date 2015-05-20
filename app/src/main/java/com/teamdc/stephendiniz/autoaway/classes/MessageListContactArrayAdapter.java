@@ -1,7 +1,5 @@
 package com.teamdc.stephendiniz.autoaway.classes;
 
-import com.teamdc.stephendiniz.autoaway.R;
-
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,18 +7,20 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.teamdc.stephendiniz.autoaway.R;
+
 import java.util.List;
 
-public class MessageListArrayAdapter extends ArrayAdapter<PhoneContact> {
+public class MessageListContactArrayAdapter extends ArrayAdapter<Contact> {
 
     private Activity context;
-    private List<PhoneContact> phoneContacts;
+    private List<Contact> contacts;
 
-    public MessageListArrayAdapter(Activity context, List<PhoneContact> contacts){
+    public MessageListContactArrayAdapter(Activity context, List<Contact> contacts){
         super(context, R.layout.message_list, contacts);
 
         this.context = context;
-        this.phoneContacts = contacts;
+        this.contacts = contacts;
     }
 
 	@Override
@@ -32,14 +32,10 @@ public class MessageListArrayAdapter extends ArrayAdapter<PhoneContact> {
 		TextView textTitle = (TextView) rowView.findViewById(R.id.dl_Title);
 		TextView textContent = (TextView) rowView.findViewById(R.id.dl_Content);
 
-        PhoneContact phoneContact = phoneContacts.get(position);
-        textTitle.setText(phoneContact.getName());
+        Contact contact = contacts.get(position);
 
-        if(phoneContact.hasMultipleNumbers()){
-            textContent.setText(context.getResources().getString(R.string.pref_contacts_multiple));
-        } else {
-            textContent.setText(phoneContact.getNumber());
-        }
+        textTitle.setText(contact.getName());
+        textContent.setText(contact.getNumber());
 
 		return rowView;
 	}

@@ -1,7 +1,5 @@
 package com.teamdc.stephendiniz.autoaway.classes;
 
-import com.teamdc.stephendiniz.autoaway.R;
-
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,14 +7,16 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.teamdc.stephendiniz.autoaway.R;
+
 import java.util.List;
 
-public class MessageListArrayAdapter extends ArrayAdapter<PhoneContact> {
+public class MessageListPhoneContactArrayAdapter extends ArrayAdapter<PhoneContact> {
 
     private Activity context;
     private List<PhoneContact> phoneContacts;
 
-    public MessageListArrayAdapter(Activity context, List<PhoneContact> contacts){
+    public MessageListPhoneContactArrayAdapter(Activity context, List<PhoneContact> contacts){
         super(context, R.layout.message_list, contacts);
 
         this.context = context;
