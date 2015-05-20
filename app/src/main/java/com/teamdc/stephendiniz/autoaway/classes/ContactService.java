@@ -17,13 +17,13 @@ import static com.teamdc.stephendiniz.autoaway.classes.Utils.*;
 /**
  * Created by sscotti on 5/19/15.
  */
-public class ContactFinder {
+public class ContactService {
 
     private Context context;
 
     private final String MULTIPLE_NUMBERS;
 
-    public ContactFinder(Context context){
+    public ContactService(Context context){
         this.context = context;
         MULTIPLE_NUMBERS = context.getResources().getString(R.string.pref_contacts_multiple);
     }
@@ -32,7 +32,7 @@ public class ContactFinder {
 
         List<PhoneContact> phoneContacts = new ArrayList<PhoneContact>();
 
-        Cursor cursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+        Cursor contactsCursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
 
         Uri contentUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
         String[] projection = null;
@@ -40,36 +40,36 @@ public class ContactFinder {
         String sortOrder = null;
 
         //Checks phoneContacts for the number passed (returnAddress)
-        while (cursor.moveToNext())	{
+        while (contactsCursor.moveToNext())	{
 
-            int num = cursor.getInt(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+            int num = contactsCursor.getInt(contactsCursor.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
             if (num > 0) {
 
-                String name = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
-                String id = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+                String name = contactsCursor.getString(contactsCursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
+                String id = contactsCursor.getString(contactsCursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
 
                 PhoneContact phoneContact = new PhoneContact(name, id);
 
                 String[] selectionArgs = {id};
 
-                Cursor phone = context.getContentResolver().query(contentUri, projection, selection, selectionArgs, sortOrder);
+                Cursor phoneCursor = context.getContentResolver().query(contentUri, projection, selection, selectionArgs, sortOrder);
 
-                for (phone.moveToFirst(); !phone.isAfterLast(); phone.moveToNext()){
+                for (phoneCursor.moveToFirst(); !phoneCursor.isAfterLast(); phoneCursor.moveToNext()){
 
-                    String phoneNumber = hyphenatePhoneNumber(phone.getString(phone.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER)));
+                    String phoneNumber = hyphenatePhoneNumber(phoneCursor.getString(phoneCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER)));
                     phoneContact.addPhoneNumber(phoneNumber);
 
                 }
 
-                phone.close();
+                phoneCursor.close();
 
                 phoneContacts.add(phoneContact);
             }
 
         }
 
-        cursor.close();
+        contactsCursor.close();
 
         sortPhoneContactsByName(phoneContacts);
 
@@ -77,7 +77,7 @@ public class ContactFinder {
 
     }
 
-    public PhoneContact getByName(List<PhoneContact> contacts, String name){
+    public PhoneContact getPhoneContactByName(List<PhoneContact> contacts, String name){
 
         for(PhoneContact contact : contacts){
             if(contact.getName().equals(name)){
@@ -86,6 +86,25 @@ public class ContactFinder {
         }
 
         return null;
+    }
+
+    public boolean phoneContactExists(List<PhoneContact> phoneContacts, String name){
+        return this.getPhoneContactByName(phoneContacts, name) != null;
+    }
+
+    public Contact getContactByName(List<Contact> contacts, String name){
+
+        for(Contact contact : contacts){
+            if(contact.getName().equals(name)){
+                return contact;
+            }
+        }
+
+        return null;
+    }
+
+    public boolean contactExists(List<Contact> contacts, String name){
+        return this.getContactByName(contacts, name) != null;
     }
 
     public void sortPhoneContactsByName(List<PhoneContact> contacts){

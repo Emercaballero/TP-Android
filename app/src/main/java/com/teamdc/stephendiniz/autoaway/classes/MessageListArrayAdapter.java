@@ -11,16 +11,16 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public class MessageListArrayAdapter extends ArrayAdapter<PhoneContact> {
+public class MessageListArrayAdapter extends ArrayAdapter<Listable> {
 
     private Activity context;
-    private List<PhoneContact> phoneContacts;
+    private List<Listable> listableItems;
 
-    public MessageListArrayAdapter(Activity context, List<PhoneContact> contacts){
-        super(context, R.layout.message_list, contacts);
+    public MessageListArrayAdapter(Activity context, List<Listable> listableItems){
+        super(context, R.layout.message_list, listableItems);
 
         this.context = context;
-        this.phoneContacts = contacts;
+        this.listableItems = listableItems;
     }
 
 	@Override
@@ -32,14 +32,10 @@ public class MessageListArrayAdapter extends ArrayAdapter<PhoneContact> {
 		TextView textTitle = (TextView) rowView.findViewById(R.id.dl_Title);
 		TextView textContent = (TextView) rowView.findViewById(R.id.dl_Content);
 
-        PhoneContact phoneContact = phoneContacts.get(position);
-        textTitle.setText(phoneContact.getName());
+        Listable phoneContact = listableItems.get(position);
+        textTitle.setText(phoneContact.getTitle());
 
-        if(phoneContact.hasMultipleNumbers()){
-            textContent.setText(context.getResources().getString(R.string.pref_contacts_multiple));
-        } else {
-            textContent.setText(phoneContact.getNumber());
-        }
+        textContent.setText(phoneContact.getContent());
 
 		return rowView;
 	}

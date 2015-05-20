@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -28,10 +29,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.teamdc.stephendiniz.autoaway.R;
 import com.teamdc.stephendiniz.autoaway.classes.Contact;
+import com.teamdc.stephendiniz.autoaway.classes.ContactService;
 import com.teamdc.stephendiniz.autoaway.classes.MessageListArrayAdapter;
-import com.teamdc.stephendiniz.autoaway.classes.MessageListContactArrayAdapter;
+
+import static com.teamdc.stephendiniz.autoaway.classes.Utils.*;
 
 public class Activity_Filtering extends ListActivity
 {
@@ -40,11 +42,10 @@ public class Activity_Filtering extends ListActivity
 	private int filterStatus;
 	private String file;
 	
-	private ArrayList<Contact> contacts = new ArrayList<Contact>();
+	private List<Contact> contacts = new ArrayList<Contact>();
 
-	private String[] sNames;
-	private String[] sNumbers;
-	
+    private ContactService contactService;
+
 	Resources r;
 	Dialog dialog;
 	private Bundle infoBundle;
@@ -70,6 +71,8 @@ public class Activity_Filtering extends ListActivity
 	public void onCreate(Bundle savedInstanceState)
 	{
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        contactService = new ContactService(this);
 
 		if(android.os.Build.VERSION.SDK_INT >= 14)
 		{
@@ -106,7 +109,7 @@ public class Activity_Filtering extends ListActivity
 
 		grabNumbers(getFile());
 
-		setListAdapter(new MessageListContactArrayAdapter(this, contacts));
+		setListAdapter(new MessageListArrayAdapter(this, asListable(contacts)));
 		
 		registerForContextMenu(getListView());
 	}
@@ -159,26 +162,25 @@ public class Activity_Filtering extends ListActivity
 					{
 						EditText eName = (EditText)dialog.findViewById(R.id.dialog_filteringNameEdit_add);
 						EditText eNumber = (EditText)dialog.findViewById(R.id.dialog_filteringNumberEdit_add);
-						
-						if(eName.getText().toString().equals("") || eName.getText().toString().equals(null) || eNumber.getText().toString().equals("") || eNumber.getText().toString().equals(null))
-							showTheMessage(FILTERING_BLANK, null);
-						else
-						{
-							if (numberExists(hyphenate(eNumber.getText().toString())))
-								showTheMessage(FILTERING_ERROR_EXISTS, null);
-							
-							else
-							{
-								Contact newContact = new Contact(eName.getText().toString().trim(), hyphenate(eNumber.getText().toString().trim()));
-								contacts.add(newContact);
-								showTheMessage(FILTERING_ADDED, eName.getText().toString().trim());
-								dialog.cancel();
-								sortNames();
-								saveNumbers(getFile());
-								startActivity(getIntent()); finish();
+
+                        String name = eName.getText().toString();
+                        String number = eNumber.getText().toString();
+
+                        if(name == null || "".equals(name) || number == null || "".equals(number)){
+                            showTheMessage(FILTERING_BLANK, null);
+                        } else if (contactService.contactExists(contacts, name)) {
+                            showTheMessage(FILTERING_ERROR_EXISTS, null);
+                        } else {
+                            Contact newContact = new Contact(name.trim(), hyphenatePhoneNumber(number.trim()));
+                            contacts.add(newContact);
+                            showTheMessage(FILTERING_ADDED, name.trim());
+                            dialog.cancel();
+                            contactService.sortContactsByName(contacts);
+                            saveNumbers(getFile());
+                            startActivity(getIntent());
+                            finish();
 							}
 						}
-					}
 				});
 				
 				Button nButton = (Button)dialog.findViewById(R.id.dialog_filteringButtonNegative_add);
@@ -196,7 +198,8 @@ public class Activity_Filtering extends ListActivity
 			case R.id.filtering_contact_removeAll:
 				contacts.removeAll(contacts);
 				saveNumbers(getFile());
-				startActivity(getIntent()); finish();
+				startActivity(getIntent());
+                finish();
 			break;
 			case android.R.id.home:
 	            Intent parentActivityIntent = new Intent(this, Activity_Main.class);
@@ -249,12 +252,12 @@ public class Activity_Filtering extends ListActivity
 
 					else
 					{
-						if((contacts.get(iId).getName().equals(eName.getText().toString())) && (contacts.get(iId).getNumber().equals(hyphenate(eNumber.getText().toString()))))
+						if((contacts.get(iId).getName().equals(eName.getText().toString())) && (contacts.get(iId).getNumber().equals(hyphenatePhoneNumber(eNumber.getText().toString()))))
 							dialog.cancel();
 
 						else
 						{
-							contacts.get(iId).setInfo(eName.getText().toString().trim(), hyphenate(eNumber.getText().toString().trim()));
+							contacts.get(iId).setInfo(eName.getText().toString().trim(), hyphenatePhoneNumber(eNumber.getText().toString().trim()));
 							showTheMessage(FILTERING_SAVED, eName.getText().toString().trim());
 							dialog.cancel();
 							saveNumbers(getFile());
@@ -291,72 +294,63 @@ public class Activity_Filtering extends ListActivity
 	  return true;
 	}
 
-	public boolean grabNumbers(String file)
-	{
-		int numOfContacts = 0;
+	public boolean grabNumbers(String file) {
+		contacts.clear();
 
-		contacts.removeAll(contacts);
-		
-		try
-		{
+		try {
 			File inFile = getBaseContext().getFileStreamPath(getFile());
-			
-			if (inFile.exists())
-			{
+
+			if (inFile.exists()) {
 				InputStream iStream = openFileInput(getFile());
 				InputStreamReader iReader = new InputStreamReader(iStream);
 				BufferedReader bReader = new BufferedReader(iReader);
-				
+
 				String line;
 				//Should be in groups of TWO!
-				while((line = bReader.readLine()) != null)
-				{
+				while((line = bReader.readLine()) != null) {
 					Contact contactFromFile = new Contact(line, bReader.readLine());
 					contacts.add(contactFromFile);
-					numOfContacts++;
 				}
-				
+
 				iStream.close();
-				
-				Log.i(TAG, numOfContacts + " contacts(s) read from file");
+
+				Log.i(TAG, contacts.size() + " contacts(s) read from file");
 			}
 			else
 				Log.w(TAG, "\"" + getFile() + "\" was not found!");
 		}
 		catch (java.io.FileNotFoundException exception) { Log.e(TAG, "FileNotFoundException caused by openFileInput(fileName)", exception); }
 		catch (IOException exception) 					{ Log.e(TAG, "IOException caused by buffreader.readLine()", exception); 			}
-		
-		sNames = new String[contacts.size()];
-		sNumbers = new String[contacts.size()];
-		
-		for (int i = 0; i < contacts.size(); i++)
-		{
-			sNames[i] = contacts.get(i).getName();
-			sNumbers[i] = contacts.get(i).getNumber();
-		}
-		
-		if(contacts.isEmpty())
-			return false;
-		
-		return true;
+
+		return !contacts.isEmpty();
 	}
 	
-	public void saveNumbers(String file)
-	{
-		try
-		{
-			OutputStreamWriter oWriter = new OutputStreamWriter(openFileOutput(file, 0));
-			
-			for(int i = 0; i < contacts.size(); i++)
-			{
-				oWriter.append(contacts.get(i).getName() + "\n");
-				oWriter.append(contacts.get(i).getNumber() + "\n");
-			}
-		
-		oWriter.flush();
-		oWriter.close();
-		}
-		catch (java.io.IOException exception) { Log.e(TAG, "IOException caused by trying to access " + file, exception); };
+	public void saveNumbers(String file){
+        OutputStreamWriter oWriter = null;
+        try{
+
+            oWriter = new OutputStreamWriter(openFileOutput(file, 0));
+
+            for(Contact contact : contacts){
+                oWriter.append(contact.getName() + "\n");
+                oWriter.append(contact.getNumber() + "\n");
+            }
+
+		} catch (IOException exception) {
+            Log.e(TAG, "IOException caused by trying to access " + file, exception);
+        } finally {
+
+            try {
+
+                if(oWriter != null){
+                    oWriter.flush();
+                    oWriter.close();
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "IOException caused by trying to close " + file, e);
+            }
+
+        }
 	}
 	
 	public void showTheMessage(int id, String extra)
@@ -389,61 +383,7 @@ public class Activity_Filtering extends ListActivity
 		Toast eToast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
 		eToast.show();
 	}
-	
-	public void sortNames()
-	{
-		// Bubble Sort with Object Specialized Data Swap
-		for (int i = 0; i < contacts.size(); i++)
-			for (int j = 0; j < contacts.size()-1-i; j++)
-				if(contacts.get(j).getName().compareTo(contacts.get(j+1).getName()) > 0)
-				{
-					String tmpName = contacts.get(j).getName();
-					String tmpNumber = contacts.get(j).getNumber();
 
-					contacts.get(j).setInfo(contacts.get(j+1).getName(), contacts.get(j+1).getNumber());
-					contacts.get(j+1).setInfo(tmpName, tmpNumber);
-				}
-	}
-	
-	public String hyphenate(String number)
-	{
-		number = number.replaceAll("[^\\d]", "");
-		if (number.length() == 10)
-			return number.substring(0,3) + "-" + number.substring(3,6) + "-" + number.substring(6,10);
-		
-		if (number.length() == 11)
-			return number.substring(0,1) + "-" + number.substring(1,4) + "-" + number.substring(4,7) + "-" + number.substring(7,11);
-		
-		//Not 10 digits long - Unable to hyphenate
-		return number;
-	}
-	
-	public String dehyphenate(String number)
-	{
-		if (number.length() == 12)
-			return number.substring(0,3) + number.substring(4,7) + number.substring(8,12);
-		
-		if (number.length() == 14)
-			return number.substring(0,1) + number.substring(2,5) + number.substring(6,9) + number.substring(10,14);
-		return number;
-	}
-	
-	public boolean numberExists(String name)
-	{
-		boolean exists = false;
-
-		for (int i = 0; i < contacts.size(); i++)
-		{
-			if (contacts.get(i).getName().equals(name))
-			{
-				exists = true;
-				break;
-			}
-		}
-
-		return exists;
-	}
-	
 	public int getFilterStatus()						{ return filterStatus; 					}
 	public void setFilterStatus(int filterStatus)		{ this.filterStatus = filterStatus;		}
 	

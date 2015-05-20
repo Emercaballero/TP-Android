@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -31,13 +32,15 @@ import android.widget.Toast;
 import com.teamdc.stephendiniz.autoaway.classes.Message;
 import com.teamdc.stephendiniz.autoaway.classes.MessageListArrayAdapter;
 
+import static com.teamdc.stephendiniz.autoaway.classes.Utils.*;
+
 public class Activity_Messages extends ListActivity
 {
 	private static final String	TAG = "Messages";
 
 	private final String messagesFile	= "awayMessages.txt";
 
-	private ArrayList<Message> messages = new ArrayList<Message>();
+	private List<Message> messages = new ArrayList<Message>();
 	
 	private String[] sTitle;
 	private String[] sContent;
@@ -75,9 +78,8 @@ public class Activity_Messages extends ListActivity
 			getActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		messagesExist(messagesFile);
-		
-//		MessageListArrayAdapter adapter = new MessageListArrayAdapter(this, sTitle, sContent);
-//		setListAdapter(adapter);
+
+		setListAdapter(new MessageListArrayAdapter(this, asListable(messages)));
 		
 		registerForContextMenu(getListView());
 	}

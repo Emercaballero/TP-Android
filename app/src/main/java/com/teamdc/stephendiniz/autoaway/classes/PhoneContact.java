@@ -3,8 +3,7 @@ package com.teamdc.stephendiniz.autoaway.classes;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhoneContact
-{
+public class PhoneContact implements Listable {
 	private String name;
 	private String number;
 	private String id;
@@ -43,6 +42,9 @@ public class PhoneContact
         return this.phoneNumbers.size() > 1;
     }
 
+    public boolean hasPhoneNumber(){
+        return !this.phoneNumbers.isEmpty();
+    }
     public List<Contact> splitInContacts(){
         List<Contact> contacts = new ArrayList<Contact>(this.phoneNumbers.size());
 
@@ -58,5 +60,13 @@ public class PhoneContact
     @Override
     public String toString() {
         return name;
+    }
+
+    public String getTitle() {
+        return name;
+    }
+
+    public String getContent() {
+        return this.hasPhoneNumber() ? this.hasMultipleNumbers() ? "Multiple numbers" : this.phoneNumbers.get(0) : "<no number>";
     }
 }

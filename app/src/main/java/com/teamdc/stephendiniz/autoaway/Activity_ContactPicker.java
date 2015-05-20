@@ -7,9 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -26,10 +24,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.teamdc.stephendiniz.autoaway.classes.Contact;
-import com.teamdc.stephendiniz.autoaway.classes.ContactFinder;
+import com.teamdc.stephendiniz.autoaway.classes.ContactService;
 import com.teamdc.stephendiniz.autoaway.classes.MessageListArrayAdapter;
-import com.teamdc.stephendiniz.autoaway.classes.MessageListPhoneContactArrayAdapter;
 import com.teamdc.stephendiniz.autoaway.classes.PhoneContact;
+
+import static com.teamdc.stephendiniz.autoaway.classes.Utils.*;
 
 public class Activity_ContactPicker extends ListActivity 
 {	
@@ -57,13 +56,13 @@ public class Activity_ContactPicker extends ListActivity
 
 	private int filterStatus;
 	private String file;
-    private ContactFinder contactFinder;
+    private ContactService contactService;
 
     @SuppressLint("NewApi")
 	public void onCreate(Bundle SavedInstanceState)
 	{
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        contactFinder = new ContactFinder(this);
+        contactService = new ContactService(this);
 
 		if(android.os.Build.VERSION.SDK_INT >= 14)
 		{
@@ -98,9 +97,9 @@ public class Activity_ContactPicker extends ListActivity
 		
 		grabNumbers(getFile());
 
-        pContacts = contactFinder.getAllPhoneContacts();
+        pContacts = contactService.getAllPhoneContacts();
 
-		setListAdapter(new MessageListPhoneContactArrayAdapter(this, pContacts));
+		setListAdapter(new MessageListArrayAdapter(this, asListable(pContacts)));
 	}
 
     @SuppressLint("NewApi")
@@ -113,7 +112,7 @@ public class Activity_ContactPicker extends ListActivity
 		String added = null;
 		String keyword = o.toString();
 		String name = keyword;
-        PhoneContact phoneContact = contactFinder.getByName(pContacts, name);
+        PhoneContact phoneContact = contactService.getPhoneContactByName(pContacts, name);
         String search = phoneContact.getId();
 
         List<Contact> contactList = phoneContact.splitInContacts();
@@ -130,7 +129,7 @@ public class Activity_ContactPicker extends ListActivity
 //        if (count > 0)
 			showTheMessage(FILTERING_ADDED, name);
 
-		contactFinder.sortContactsByName(contacts);
+		contactService.sortContactsByName(contacts);
 		saveNumbers(getFile());	
 		finish();
 	}
