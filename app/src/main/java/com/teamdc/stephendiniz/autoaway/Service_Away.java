@@ -39,6 +39,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import static com.teamdc.stephendiniz.autoaway.classes.Utils.*;
 
 public class Service_Away extends Service
 {
@@ -456,10 +457,8 @@ public class Service_Away extends Service
 			catch (java.io.FileNotFoundException exception) { Log.e(TAG, "FileNotFoundException caused by openFileInput(fileName)", exception); }
 			catch (IOException exception) 					{ Log.e(TAG, "IOException caused by buffreader.readLine()", exception); 			}
 
-			if (numOfFilters == 0)
-			{
-				Toast eToast = Toast.makeText(this, getResources().getString(R.string.prompt_filtering_empty), Toast.LENGTH_LONG);
-				eToast.show();
+			if (numOfFilters == 0) {
+			    Toast.makeText(this, getResources().getString(R.string.prompt_filtering_empty), Toast.LENGTH_LONG).show();
 			}
 			else
 				Log.i(TAG, "Filters Loaded: " + numOfFilters);
@@ -616,17 +615,6 @@ public class Service_Away extends Service
 	}
 	
 	@SuppressLint("NewApi")
-	private String dehyphenate(String number)
-	{
-		if (number.length() == 12)
-			return number.substring(0,3) + number.substring(4,7) +  number.substring(8,12);
-		else if (number.length() == 14)
-			return number.substring(0,1) + number.substring(2,5) +  number.substring(6,9) + number.substring(10,14);
-
-		return number;
-	}
-	
-	@SuppressLint("NewApi")
 	private boolean numberInContacts()
 	{
 		Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(getReturnAddress()));
@@ -678,7 +666,7 @@ public class Service_Away extends Service
         Location currentLocation = gps.getCurrentLocation(provider);
 		String prefix = status ? "[Auto-Away]: " : "";
 
-        return prefix + messageContent + " " + currentLocation;
+        return String.format("%s%s [%.3f, %.3f]", prefix, messageContent, currentLocation.getLatitude(), currentLocation.getLongitude());
 	}
 
 	public void setMessageContent(String messageContent)	{ this.messageContent = messageContent;								}

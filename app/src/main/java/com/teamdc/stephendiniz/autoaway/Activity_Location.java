@@ -198,7 +198,7 @@ public class Activity_Location extends Activity implements View.OnClickListener 
                 text = "No network signal!";
             }
         } else {
-            text = String.format("Lat=%.1f Long=%.1f",location.getLatitude(), location.getLongitude());
+            text = String.format("Latitude=%.3f Longitude=%.3f",location.getLatitude(), location.getLongitude());
         }
 
         textView.setText(text);
