@@ -173,6 +173,5 @@
 	<string name="error_radio_off">Failed to send Auto-Response because phone radio is off!</string>
     <string name="title_activity_activity__location">Activity_Location</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 </resources>

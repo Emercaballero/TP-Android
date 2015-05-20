@@ -11,7 +11,7 @@
 	<string name="activity_whitelist_title">Whitelist</string>
 	<string name="activity_scheduling_title">Lejos de Programación</string>
 	<string name="activity_location">Localizacion</string>
-	
+
 	<!-- Preference Categories -->
 	<string name="pref_category_general">Preferencias Generales</string>
 	<string name="pref_category_logging">Preferencias de Archivo</string>
@@ -171,5 +171,9 @@
 
 	<string name="error_no_service">No se pudo enviar respuesta automática a causa de No Service!</string>
 	<string name="error_radio_off">No se pudo enviar respuesta automática porque la radio está apagado!</string>
+
+    <string name="title_activity_activity__location">Activity_Location</string>
+    <string name="action_settings">Configuracion</string>
+
 
 </resources>

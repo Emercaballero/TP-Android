@@ -171,4 +171,7 @@
 
 	<string name="error_no_service">Echec d\'envoi de réponse automatique en raison de Pas de service!</string>
 	<string name="error_radio_off">Echec d\'envoi de réponse automatique parce que la radio est éteint!</string>
+
+    <string name="title_activity_activity__location">Activity_Location</string>
+    <string name="action_settings">Settings</string>
 </resources>

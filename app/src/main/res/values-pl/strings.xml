@@ -171,4 +171,7 @@
 
 	<string name="error_no_service">Nie udało się wysłać autoodpowidzi z uwagi na brak obsługi!</string>
 	<string name="error_radio_off">Nie udało się wysłać autoodpowiedzi z uwagi wyłączony telefon odbiorcy!</string>
+
+    <string name="title_activity_activity__location">Activity_Location</string>
+    <string name="action_settings">Settings</string>
 </resources>
