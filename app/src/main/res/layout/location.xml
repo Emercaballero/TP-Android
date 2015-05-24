@@ -9,7 +9,7 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="41dp"
+        android:layout_marginTop="47dp"
         android:layout_below="@+id/radioGroup1"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -76,5 +76,15 @@
         android:text="View"
         android:layout_alignTop="@+id/button1"
         android:layout_centerHorizontal="true" />
+
+    <CheckBox
+        android:id="@+id/flashCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Aviso de flash"
+        android:checked="false"
+        android:layout_marginTop="100dp"
+        android:layout_alignLeft="@+id/locationCheck"
+        android:layout_alignStart="@+id/locationCheck" />
 
 </RelativeLayout>

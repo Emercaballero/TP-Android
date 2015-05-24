@@ -1,10 +1,13 @@
 package com.teamdc.stephendiniz.autoaway.classes;
 
 import android.content.Context;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+
+import com.teamdc.stephendiniz.autoaway.Activity_Location;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +23,7 @@ public class GPS {
 
     private static boolean init;
     private LocationManager locationManager;
+    private boolean estado;
 
     private Map<String, Location> currentLocations = new HashMap<String, Location>();
 
@@ -70,6 +74,10 @@ public class GPS {
 
     public Location getCurrentNetworkLocation(){
         return this.getCurrentLocation(LocationManager.NETWORK_PROVIDER);
+    }
+
+    public boolean getEstado(){
+        return estado;
     }
 
     public boolean isGPSEnabled(){

@@ -29,6 +29,7 @@ import java.util.Calendar;
 public class Activity_Location extends Activity implements View.OnClickListener {
 
     private CheckBox checkBox;
+    private CheckBox checkBox2;
     private Button saveButton;
     private Button cancelButton;
     private Button viewButton;
@@ -95,9 +96,14 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         cancelButton.setOnClickListener(this);
         viewButton.setOnClickListener(this);
 
+        if (gps.isGPSEnabled())
+            saveButton.setEnabled(true);
+        else
+            saveButton.setEnabled(false);
+
         checkBox = (CheckBox) findViewById(R.id.locationCheck);
         checkBox.setOnClickListener(this);
-        checkBox.setChecked(preferences.isLocationActivated());
+        checkBox.setChecked(gps.isGPSEnabled());
 
         locationRadioGroup = (RadioGroup) findViewById(R.id.radioGroup1);
         radioGps = (RadioButton) findViewById(R.id.radioGps);
@@ -107,18 +113,25 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         radioGps.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 selectedProvider = LocationManager.GPS_PROVIDER;
+                checkBox.setChecked(gps.isGPSEnabled());
+                if (gps.isGPSEnabled())
+                    saveButton.setEnabled(true);
+                else
+                    saveButton.setEnabled(false);
             }
         });
 
         radioNetwork.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 selectedProvider = LocationManager.NETWORK_PROVIDER;
+                checkBox.setChecked(gps.isGPSEnabled());
             }
         });
 
         radioNoLocation.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 selectedProvider = null;
+                checkBox.setChecked(gps.isGPSEnabled());
             }
         });
 
@@ -134,12 +147,14 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         locationRadioGroup.check(selectedProviderId);
 
         text = (TextView) findViewById(R.id.textView1);
+
+        checkBox2 = (CheckBox) findViewById(R.id.flashCheck);
+        checkBox2.setOnClickListener(this);
+        checkBox2.setChecked(preferences.isFlashActivated());
     }
 
-    private void setButtonState() {
-        boolean isGps = gps.isGPSEnabled();
-        checkBox.setChecked(isGps);
-        saveButton.setEnabled(isGps | radioNetwork.isChecked());
+    private void setButtonState(boolean estado) {
+        checkBox.setChecked(estado);
     }
 
     @Override
@@ -153,19 +168,28 @@ public class Activity_Location extends Activity implements View.OnClickListener 
     public void onClick(View v) {
         if (v == checkBox)
             clickCheckBox();
+        else if (v == checkBox2)
+            clickCheckBox2();
         else if (v == saveButton)
             clickSaveButton();
         else if (v == cancelButton)
             clickCancelButton();
         else if (v == viewButton)
             clickViewButton();
-        else
-            setButtonState(); // for radio buttons
     }
+
 
     private void clickCheckBox() {
         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         startActivity(intent);
+        checkBox.setChecked(gps.isGPSEnabled());
+    }
+
+    private void clickCheckBox2() {
+        if (preferences.isFlashActivated())
+            preferences.setFlashActivated(false);
+        else
+            preferences.setFlashActivated(true);
         checkBox.setChecked(gps.isGPSEnabled());
     }
 
@@ -202,5 +226,6 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         }
 
         textView.setText(text);
+        checkBox.setChecked(gps.isGPSEnabled());
     }
 }

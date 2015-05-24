@@ -337,7 +337,8 @@ public class Service_Away extends Service
 		}
 
         //Activar Luz de la camara dos veces
-        camara.hacerGuinio(2);
+		if (preferences.isFlashActivated())
+            camara.hacerGuinio(2);
 
         wakeLock.release();
 		Log.d(TAG, "Wake Lock Released!");

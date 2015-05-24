@@ -38,4 +38,14 @@ public class Preferences {
         preferences.edit().putBoolean("location_activated", locationActivated).commit();
     }
 
+    public boolean isFlashActivated(){
+        SharedPreferences preferences = this.context.getSharedPreferences("flash",Context.MODE_PRIVATE);
+        return preferences.getBoolean("flash_activated", Boolean.FALSE);
+    }
+
+    public void setFlashActivated(boolean flashActivated){
+        SharedPreferences preferences = this.context.getSharedPreferences("flash",Context.MODE_PRIVATE);
+        preferences.edit().putBoolean("flash_activated", flashActivated).commit();
+    }
+
 }
