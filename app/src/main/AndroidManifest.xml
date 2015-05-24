@@ -60,11 +60,6 @@
         	android:name=".Activity_Filtering"
         	android:configChanges="orientation|keyboardHidden" >
 
-        	<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-        		android:priority="9001">
-        	</intent-filter>
 
         </activity>
 
@@ -72,13 +67,6 @@
         	android:name=".Activity_Schedule"
         	android:configChanges="orientation|keyboardHidden"
         	android:label="@string/activity_scheduling_title" >
-
-        	<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-        		android:priority="9001">
-        	</intent-filter>
-
         </activity>
 
         <service

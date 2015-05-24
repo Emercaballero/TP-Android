@@ -48,4 +48,14 @@ public class Preferences {
         preferences.edit().putBoolean("flash_activated", flashActivated).commit();
     }
 
+    public boolean getCiudadActivated(){
+        SharedPreferences preferences = this.context.getSharedPreferences("ciudad",Context.MODE_MULTI_PROCESS);
+        return preferences.getBoolean("ciudad_activated", Boolean.FALSE);
+    }
+
+    public void setCiudadActivated(boolean selec){
+        SharedPreferences preferences = this.context.getSharedPreferences("ciudad",Context.MODE_PRIVATE);
+        preferences.edit().putBoolean("ciudad_activated", selec).commit();
+    }
+
 }

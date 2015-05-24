@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.teamdc.stephendiniz.autoaway.classes.GPS;
 import com.teamdc.stephendiniz.autoaway.classes.Preferences;
 
+import java.io.IOException;
 import java.util.Calendar;
 
 
@@ -30,6 +31,7 @@ public class Activity_Location extends Activity implements View.OnClickListener 
 
     private CheckBox checkBox;
     private CheckBox checkBox2;
+    private CheckBox checkBox3;
     private Button saveButton;
     private Button cancelButton;
     private Button viewButton;
@@ -105,6 +107,11 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         checkBox.setOnClickListener(this);
         checkBox.setChecked(gps.isGPSEnabled());
 
+
+        checkBox3 = (CheckBox) findViewById(R.id.ciudadCheck);
+        checkBox3.setOnClickListener(this);
+        checkBox3.setChecked(preferences.getCiudadActivated());
+
         locationRadioGroup = (RadioGroup) findViewById(R.id.radioGroup1);
         radioGps = (RadioButton) findViewById(R.id.radioGps);
         radioNetwork = (RadioButton) findViewById(R.id.radioNetwork);
@@ -170,12 +177,18 @@ public class Activity_Location extends Activity implements View.OnClickListener 
             clickCheckBox();
         else if (v == checkBox2)
             clickCheckBox2();
+        else if (v == checkBox3)
+            clickCheckBox3();
         else if (v == saveButton)
             clickSaveButton();
         else if (v == cancelButton)
             clickCancelButton();
         else if (v == viewButton)
-            clickViewButton();
+            try {
+                clickViewButton();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     }
 
 
@@ -190,11 +203,18 @@ public class Activity_Location extends Activity implements View.OnClickListener 
             preferences.setFlashActivated(false);
         else
             preferences.setFlashActivated(true);
-        checkBox.setChecked(gps.isGPSEnabled());
+        checkBox2.setChecked(preferences.isFlashActivated());
+    }
+
+    private void clickCheckBox3() {
+        if (preferences.getCiudadActivated())
+            preferences.setCiudadActivated(false);
+        else
+            preferences.setCiudadActivated(true);
+        checkBox3.setChecked(preferences.getCiudadActivated());
     }
 
     private void clickSaveButton() {
-        preferences.setLocationActivated(checkBox.isChecked());
         preferences.setSelectedProvider(selectedProvider);
 
         TextView textView = (TextView) findViewById(R.id.textView1);
@@ -208,7 +228,7 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         finish();
     }
 
-    private void clickViewButton() {
+    private void clickViewButton() throws IOException {
         TextView textView = (TextView) findViewById(R.id.textView1);
 
         String text = "";
@@ -222,7 +242,15 @@ public class Activity_Location extends Activity implements View.OnClickListener 
                 text = "No network signal!";
             }
         } else {
-            text = String.format("Latitude=%.3f Longitude=%.3f",location.getLatitude(), location.getLongitude());
+            if (preferences.getCiudadActivated()){
+                String ciudad = gps.getCiudad();
+                if (ciudad == null)
+                    ciudad = "Sin Ciudad";
+                text = String.format("%s",ciudad);
+            }
+            else {
+                text = String.format("Latitude=%.3f Longitude=%.3f",location.getLatitude(), location.getLongitude());
+            }
         }
 
         textView.setText(text);

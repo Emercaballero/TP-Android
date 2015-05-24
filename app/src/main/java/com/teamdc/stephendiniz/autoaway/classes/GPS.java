@@ -1,6 +1,8 @@
 package com.teamdc.stephendiniz.autoaway.classes;
 
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
@@ -9,7 +11,10 @@ import android.os.Bundle;
 
 import com.teamdc.stephendiniz.autoaway.Activity_Location;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -86,6 +91,23 @@ public class GPS {
 
     public boolean isNetworkEnabled(){
         return this.locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+
+    public String getCiudad() throws IOException {
+        Location local;
+        String ciudad;
+        local = this.getCurrentLocation();
+        Geocoder gcd = new Geocoder(context, Locale.getDefault());
+        List<Address> list = gcd.getFromLocation( local.getLatitude(), local.getLongitude(), 1);
+        if (list != null & list.size() > 0) {
+            Address dir = list.get(0);
+            ciudad = dir.getLocality();
+            return ciudad;
+        }
+        else{
+            ciudad = null;
+            return ciudad;
+        }
     }
 
     private LocationListener locationListener = new LocationListener() {

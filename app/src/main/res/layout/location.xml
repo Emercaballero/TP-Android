@@ -9,7 +9,7 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="47dp"
+        android:layout_marginTop="85dp"
         android:layout_below="@+id/radioGroup1"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -86,5 +86,15 @@
         android:layout_marginTop="100dp"
         android:layout_alignLeft="@+id/locationCheck"
         android:layout_alignStart="@+id/locationCheck" />
+
+    <CheckBox
+        android:id="@+id/ciudadCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mostrar Ciudad"
+        android:checked="false"
+        android:layout_below="@+id/flashCheck"
+        android:layout_alignLeft="@+id/flashCheck"
+        android:layout_alignStart="@+id/flashCheck" />
 
 </RelativeLayout>

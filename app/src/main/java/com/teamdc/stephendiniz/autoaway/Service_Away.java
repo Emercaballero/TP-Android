@@ -661,13 +661,34 @@ public class Service_Away extends Service
 	public void setCallText(int callText)					{ this.callText = callText;											}
 	
 	public String getMessageContent(boolean status) {
-		boolean isLocationActivated = preferences.isLocationActivated();
-        String provider = preferences.getSelectedProvider();
 
-        Location currentLocation = gps.getCurrentLocation(provider);
-		String prefix = status ? "[Auto-Away]: " : "";
+		if (preferences.getSelectedProvider() == null ){
+			String prefix = status ? "[Auto-Away]: " : "";
 
-        return String.format("%s%s [%.3f, %.3f]", prefix, messageContent, currentLocation.getLatitude(), currentLocation.getLongitude());
+			return String.format("%s%s", prefix, messageContent);
+		}
+		else if (gps.isGPSEnabled() == false){
+			String prefix = status ? "[Auto-Away]: " : "";
+
+			return String.format("%s%s [GPS Apagado]", prefix, messageContent);
+		}
+		else{
+			String provider = preferences.getSelectedProvider();
+
+			Location currentLocation = gps.getCurrentLocation(provider);
+			String prefix = status ? "[Auto-Away]: " : "";
+
+            if (preferences.getCiudadActivated()) {
+                try {
+                    return String.format("%s%s [%s]", prefix, messageContent, gps.getCiudad());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return "ERROR";
+                }
+            }
+            else
+                return String.format("%s%s [%.3f, %.3f]", prefix, messageContent, currentLocation.getLatitude(), currentLocation.getLongitude());
+		}
 	}
 
 	public void setMessageContent(String messageContent)	{ this.messageContent = messageContent;								}
