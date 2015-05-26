@@ -32,6 +32,7 @@ public class Activity_Location extends Activity implements View.OnClickListener 
     private CheckBox checkBox;
     private CheckBox checkBox2;
     private CheckBox checkBox3;
+    private CheckBox checkBoxNet;
     private Button saveButton;
     private Button cancelButton;
     private Button viewButton;
@@ -98,15 +99,13 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         cancelButton.setOnClickListener(this);
         viewButton.setOnClickListener(this);
 
-        if (gps.isGPSEnabled())
-            saveButton.setEnabled(true);
-        else
-            saveButton.setEnabled(false);
-
         checkBox = (CheckBox) findViewById(R.id.locationCheck);
         checkBox.setOnClickListener(this);
         checkBox.setChecked(gps.isGPSEnabled());
 
+        checkBoxNet = (CheckBox) findViewById(R.id.netCheck);
+        checkBoxNet.setOnClickListener(this);
+        checkBoxNet.setChecked(gps.isNetworkEnabled());
 
         checkBox3 = (CheckBox) findViewById(R.id.ciudadCheck);
         checkBox3.setOnClickListener(this);
@@ -120,7 +119,6 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         radioGps.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 selectedProvider = LocationManager.GPS_PROVIDER;
-                checkBox.setChecked(gps.isGPSEnabled());
                 if (gps.isGPSEnabled()){
                     saveButton.setEnabled(true);
                     viewButton.setEnabled(true);
@@ -135,25 +133,53 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         radioNetwork.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 selectedProvider = LocationManager.NETWORK_PROVIDER;
-                checkBox.setChecked(gps.isGPSEnabled());
+                if (gps.isNetworkEnabled()){
+                    saveButton.setEnabled(true);
+                    viewButton.setEnabled(true);
+                }
+                else{
+                    saveButton.setEnabled(false);
+                    viewButton.setEnabled(false);
+                }
             }
         });
 
         radioNoLocation.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 selectedProvider = null;
-                checkBox.setChecked(gps.isGPSEnabled());
+                viewButton.setEnabled(false);
             }
         });
 
         Integer selectedProviderId;
 
-        if(LocationManager.NETWORK_PROVIDER.equals(selectedProvider))
+        if(LocationManager.NETWORK_PROVIDER.equals(selectedProvider)){
             selectedProviderId = radioNetwork.getId();
-        else if(LocationManager.GPS_PROVIDER.equals(selectedProvider))
+            if (gps.isNetworkEnabled()){
+                saveButton.setEnabled(true);
+                viewButton.setEnabled(true);
+            }
+            else{
+                saveButton.setEnabled(false);
+                viewButton.setEnabled(false);
+            }
+        }
+        else if(LocationManager.GPS_PROVIDER.equals(selectedProvider)){
             selectedProviderId = radioGps.getId();
-        else
+            if (gps.isGPSEnabled()){
+                saveButton.setEnabled(true);
+                viewButton.setEnabled(true);
+            }
+            else{
+                saveButton.setEnabled(false);
+                viewButton.setEnabled(false);
+            }
+        }
+        else{
             selectedProviderId = radioNoLocation.getId();
+            saveButton.setEnabled(false);
+            viewButton.setEnabled(false);
+        }
 
         locationRadioGroup.check(selectedProviderId);
 
@@ -168,6 +194,7 @@ public class Activity_Location extends Activity implements View.OnClickListener 
     {
         super.onResume();
         checkBox.setChecked(gps.isGPSEnabled());
+        checkBoxNet.setChecked(gps.isNetworkEnabled());
     }
 
     private void setButtonState(boolean estado) {
@@ -183,7 +210,7 @@ public class Activity_Location extends Activity implements View.OnClickListener 
     }
 
     public void onClick(View v) {
-        if (v == checkBox)
+        if (v == checkBox || v == checkBoxNet)
             clickCheckBox();
         else if (v == checkBox2)
             clickCheckBox2();
@@ -205,7 +232,6 @@ public class Activity_Location extends Activity implements View.OnClickListener 
     private void clickCheckBox() {
         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         startActivity(intent);
-        checkBox.setChecked(gps.isGPSEnabled());
     }
 
     private void clickCheckBox2() {
@@ -264,6 +290,5 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         }
 
         textView.setText(text);
-        checkBox.setChecked(gps.isGPSEnabled());
     }
 }
