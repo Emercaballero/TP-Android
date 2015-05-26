@@ -113,7 +113,7 @@ public class Activity_Main extends PreferenceActivity implements OnPreferenceCha
 
 	static final int MENU_ITEM_MESSAGES	= 0;
 	static final int MENU_ITEM_FILTER	= 1;
-	static final int MENU_ITEM_SCHEDULE	= 2;
+	static final int MENU_ITEM_LOCATION	= 2;
 	static final int MENU_ITEM_THEME	= 3;
 	
 	static final int CALLTEXT_BOTH	= 0;
@@ -309,7 +309,7 @@ public class Activity_Main extends PreferenceActivity implements OnPreferenceCha
 		{
 			menu.getItem(MENU_ITEM_MESSAGES).setEnabled(false);
 			menu.getItem(MENU_ITEM_FILTER).setEnabled(false);
-			//menu.getItem(MENU_ITEM_SCHEDULE).setEnabled(false);
+			menu.getItem(MENU_ITEM_LOCATION).setEnabled(false);
 		}
 		else if(!getServiceStatus())
 		{
@@ -320,7 +320,7 @@ public class Activity_Main extends PreferenceActivity implements OnPreferenceCha
 			else
 				menu.getItem(MENU_ITEM_FILTER).setEnabled(true);
 			
-			//menu.getItem(MENU_ITEM_SCHEDULE).setEnabled(true);
+			menu.getItem(MENU_ITEM_LOCATION).setEnabled(true);
 		}
 		
 		return true;

@@ -121,10 +121,14 @@ public class Activity_Location extends Activity implements View.OnClickListener 
             public void onClick(View v) {
                 selectedProvider = LocationManager.GPS_PROVIDER;
                 checkBox.setChecked(gps.isGPSEnabled());
-                if (gps.isGPSEnabled())
+                if (gps.isGPSEnabled()){
                     saveButton.setEnabled(true);
-                else
+                    viewButton.setEnabled(true);
+                }
+                else{
                     saveButton.setEnabled(false);
+                    viewButton.setEnabled(false);
+                }
             }
         });
 
@@ -158,6 +162,12 @@ public class Activity_Location extends Activity implements View.OnClickListener 
         checkBox2 = (CheckBox) findViewById(R.id.flashCheck);
         checkBox2.setOnClickListener(this);
         checkBox2.setChecked(preferences.isFlashActivated());
+    }
+
+    public void onResume()
+    {
+        super.onResume();
+        checkBox.setChecked(gps.isGPSEnabled());
     }
 
     private void setButtonState(boolean estado) {
