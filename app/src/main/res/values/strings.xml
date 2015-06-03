@@ -174,4 +174,7 @@
     <string name="title_activity_activity__location">Activity_Location</string>
 
     <string name="action_settings">Settings</string>
+
+    <string name="unknown">Unknown</string>
+
 </resources>

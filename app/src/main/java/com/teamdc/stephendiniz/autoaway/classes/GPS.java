@@ -21,7 +21,7 @@ public class GPS {
     private static boolean init;
     private LocationManager locationManager;
 
-    private Map<String, Location> currentLocations = new HashMap<String, Location>();
+    private Map<String, FullLocation> currentLocations = new HashMap<String, FullLocation>();
 
     public static GPS getInstance(Context context) {
         gps.setContext(context);
@@ -42,13 +42,13 @@ public class GPS {
 
                 Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if(lastKnownLocation != null){
-                    currentLocations.put(LocationManager.GPS_PROVIDER, lastKnownLocation);
+                    currentLocations.put(LocationManager.GPS_PROVIDER, new FullLocation(lastKnownLocation, context));
                 }
 
                 lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
                 if(lastKnownLocation != null){
-                    currentLocations.put(LocationManager.NETWORK_PROVIDER, lastKnownLocation);
+                    currentLocations.put(LocationManager.NETWORK_PROVIDER, new FullLocation(lastKnownLocation, context));
                 }
 
                 init = true;
@@ -81,8 +81,9 @@ public class GPS {
     }
 
     private LocationListener locationListener = new LocationListener() {
+
         public void onLocationChanged(Location location) {
-            GPS.this.currentLocations.put(location.getProvider(), location);
+            GPS.this.currentLocations.put(location.getProvider(), new FullLocation(location, context));
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {

@@ -665,8 +665,8 @@ public class Service_Away extends Service
 
         Location currentLocation = gps.getCurrentLocation(provider);
 		String prefix = status ? "[Auto-Away]: " : "";
-
-        return String.format("%s%s [%.3f, %.3f]", prefix, messageContent, currentLocation.getLatitude(), currentLocation.getLongitude());
+        String location = isLocationActivated && currentLocation != null ? String.format("[%.3f, %.3f]", currentLocation.getLongitude(), currentLocation.getLongitude()): "";
+        return String.format("%s%s %s", prefix, messageContent, location);
 	}
 
 	public void setMessageContent(String messageContent)	{ this.messageContent = messageContent;								}

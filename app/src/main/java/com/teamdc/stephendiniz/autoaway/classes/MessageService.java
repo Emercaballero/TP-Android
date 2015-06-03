@@ -3,6 +3,8 @@ package com.teamdc.stephendiniz.autoaway.classes;
 import android.content.Context;
 import android.util.Log;
 
+import com.teamdc.stephendiniz.autoaway.R;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,6 +50,10 @@ public class MessageService {
             }
 
         }
+
+//        Message defaultMessage = new Message(context.getString(R.string.default_message_title), r.getString(R.string.default_message_content));
+//        messages.add(defaultMessage);
+
 
         return messages;
     }

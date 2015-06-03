@@ -197,8 +197,11 @@ public class Activity_Main extends PreferenceActivity implements OnPreferenceCha
 			restorePreference.setEnabled(false);
 
         messages = messageService.readMessagesFromFile();
+        Message defaultMessage = new Message(r.getString(R.string.default_message_title), r.getString(R.string.default_message_content));
+        messages.add(defaultMessage);
 
-		createListPreferences(true);
+
+        createListPreferences(true);
 	}
 
 	public boolean onPreferenceClick(Preference p)
